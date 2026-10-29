@@ -1,0 +1,66 @@
+{{define "content"}}
+<div class="page-head center">
+  <h1>Jobs List</h1>
+</div>
+
+<div class="panel">
+  <form class="filters" method="get" action="/admin/jobs">
+    <input type="text" name="q" value="{{.Data.Query}}" placeholder="Filter jobs...">
+
+    <select name="status" onchange="this.form.submit()">
+      <option value="">All Statuses</option>
+      <option value="Processing" {{if eq .Data.Status "Processing"}}selected{{end}}>Processing</option>
+      <option value="Completed"  {{if eq .Data.Status "Completed"}}selected{{end}}>Completed</option>
+      <option value="Failed"     {{if eq .Data.Status "Failed"}}selected{{end}}>Failed</option>
+      <option value="Queued"     {{if eq .Data.Status "Queued"}}selected{{end}}>Queued</option>
+    </select>
+
+    <select name="queue" onchange="this.form.submit()">
+      <option value="">All Queues</option>
+      <option value="image-processing" {{if eq .Data.Queue "image-processing"}}selected{{end}}>image-processing</option>
+      <option value="data-analysis"    {{if eq .Data.Queue "data-analysis"}}selected{{end}}>data-analysis</option>
+      <option value="video-encoding"   {{if eq .Data.Queue "video-encoding"}}selected{{end}}>video-encoding</option>
+      <option value="email-sending"    {{if eq .Data.Queue "email-sending"}}selected{{end}}>email-sending</option>
+      <option value="default"          {{if eq .Data.Queue "default"}}selected{{end}}>default</option>
+    </select>
+
+    {{if .Data.Filtered}}<a href="/admin/jobs" class="clear">Clear</a>{{end}}
+  </form>
+
+  <table class="jobs-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Queue</th><th>Priority</th>
+        <th>Status</th><th>Worker</th><th>Duration</th><th>Submitted Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Jobs}}
+      <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Queue}}</td>
+        <td><span class="pill {{.PriorityClass}}">{{.Priority}}</span></td>
+        <td><span class="pill {{.StatusClass}}">{{.Status}}</span></td>
+        <td>{{.Worker}}</td>
+        <td>{{.Duration}}</td>
+        <td>{{.Submitted}}</td>
+      </tr>
+      {{else}}
+      <tr><td colspan="8" class="empty">No jobs match your filters.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+
+  <div class="pager">
+    {{if .Data.Filtered}}
+      <span>Showing {{len .Data.Jobs}} matching jobs</span>
+    {{else}}
+      <span>Showing 1–{{len .Data.Jobs}} of {{.Data.Total}} jobs</span>
+    {{end}}
+    <span class="pages">
+      <a href="#" class="current">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a><a href="#">5</a><a href="#">›</a>
+    </span>
+  </div>
+</div>
+{{end}}

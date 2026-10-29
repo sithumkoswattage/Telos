@@ -1,0 +1,18 @@
+{{define "sidebar"}}
+<aside class="sidebar">
+  <div class="brand">{{template "logo"}}<span>Telos</span></div>
+  <nav>
+    <a href="/admin/dashboard"  class="{{if eq .Section "dashboard"}}active{{end}}">Dashboard</a>
+    <a href="/admin/jobs"       class="{{if eq .Section "jobs"}}active{{end}}">Jobs</a>
+    <a href="/admin/workers"    class="{{if eq .Section "workers"}}active{{end}}">Workers</a>
+    <a href="/admin/queues"     class="{{if eq .Section "queues"}}active{{end}}">Queues</a>
+    <a href="/admin/monitoring" class="{{if eq .Section "monitoring"}}active{{end}}">Monitoring</a>
+    <a href="/admin/logs"       class="{{if eq .Section "logs"}}active{{end}}">Logs</a>
+    <a href="/admin/settings"   class="{{if eq .Section "settings"}}active{{end}}">Settings</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar">AD</div>
+    <div class="who"><strong>Admin</strong><small>System Administrator</small></div>
+  </div>
+</aside>
+{{end}}

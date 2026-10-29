@@ -1,0 +1,32 @@
+{{define "content"}}
+<h1>System Settings</h1>
+{{template "settings-tabs" .}}
+
+<form class="card settings-card" method="post">
+  <label for="default-queue">Default queue</label>
+  <input type="text" id="default-queue" name="default_queue" value="default">
+
+  <label for="algorithm">Scheduling algorithm</label>
+  <select id="algorithm" name="algorithm">
+    <option selected>Round Robin</option>
+    <option>Priority Based</option>
+    <option>First Come First Served</option>
+  </select>
+
+  <label for="max-retries">Max retries per job</label>
+  <input type="number" id="max-retries" name="max_retries" value="3">
+
+  <label for="retry-delay">Retry delay (seconds)</label>
+  <input type="number" id="retry-delay" name="retry_delay" value="30">
+
+  <label for="job-timeout">Job timeout (minutes)</label>
+  <input type="number" id="job-timeout" name="job_timeout" value="60">
+
+  <label class="switch">
+    <input type="checkbox" name="priority_first" checked>
+    <span>Serve higher-priority queues first</span>
+  </label>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+{{end}}

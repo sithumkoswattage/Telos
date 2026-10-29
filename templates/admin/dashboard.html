@@ -1,0 +1,76 @@
+{{define "content"}}
+<h1>Dashboard</h1>
+
+<div class="stats">
+  {{range .Data.Stats}}
+  <div class="stat {{.Class}}">
+    <span>{{.Label}}</span>
+    <strong>{{.Value}}</strong>
+    <small class="trend {{.TrendClass}}">{{.Trend}}</small>
+  </div>
+  {{end}}
+</div>
+
+<div class="charts">
+
+  <div class="panel">
+    <h3>Job Status Trend</h3>
+    <div class="legend-row">
+      <span class="key completed-key">Completed</span>
+      <span class="key processing-key">Processing</span>
+      <span class="key failed-key">Failed</span>
+    </div>
+    <svg class="line-chart" viewBox="0 0 400 140" preserveAspectRatio="none">
+      <g stroke="#e6f0ec" stroke-width="1" vector-effect="non-scaling-stroke">
+        <line x1="0" y1="10"  x2="400" y2="10"  vector-effect="non-scaling-stroke"/>
+        <line x1="0" y1="50"  x2="400" y2="50"  vector-effect="non-scaling-stroke"/>
+        <line x1="0" y1="90"  x2="400" y2="90"  vector-effect="non-scaling-stroke"/>
+        <line x1="0" y1="130" x2="400" y2="130" vector-effect="non-scaling-stroke"/>
+      </g>
+      <polyline fill="none" stroke="#0d9488" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"
+        points="0,110 50,95 100,78 150,84 200,58 250,62 300,42 350,32 400,26"/>
+      <polyline fill="none" stroke="#5fe0a0" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"
+        points="0,122 50,117 100,112 150,106 200,102 250,104 300,98 350,100 400,94"/>
+      <polyline fill="none" stroke="#d9531e" stroke-width="2" stroke-dasharray="4 3" stroke-linejoin="round" vector-effect="non-scaling-stroke"
+        points="0,134 50,130 100,132 150,129 200,130 250,126 300,128 350,127 400,126"/>
+    </svg>
+    <div class="x-labels">
+      <span>Oct 10</span><span>Oct 11</span><span>Oct 12</span><span>Oct 13</span><span>Oct 14</span><span>Oct 15</span><span>Oct 16</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Jobs by Queue · {{.Data.TotalJobs}} total</h3>
+    <div class="donut-row">
+      <!-- Slices: 32%, 22%, 18%, 14%, 8%, 6% (sample data) -->
+      <svg class="donut" viewBox="0 0 42 42">
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#0b2e2b" stroke-dasharray="31.4 68.6" stroke-dashoffset="25"/>
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#134e4a" stroke-dasharray="21.4 78.6" stroke-dashoffset="93"/>
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#0d9488" stroke-dasharray="17.4 82.6" stroke-dashoffset="71"/>
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#57d890" stroke-dasharray="13.4 86.6" stroke-dashoffset="53"/>
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#b9f8d6" stroke-dasharray="7.4 92.6" stroke-dashoffset="39"/>
+        <circle cx="21" cy="21" r="15.9155" fill="none" stroke-width="6.5" stroke="#94b8b0" stroke-dasharray="5.4 94.6" stroke-dashoffset="31"/>
+      </svg>
+      <ul class="queue-legend">
+        {{range .Data.Queues}}
+        <li><i class="dot {{.Class}}"></i>{{.Name}} · {{.Percent}}%</li>
+        {{end}}
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="panel">
+  <h3>Recent jobs</h3>
+  <div class="recent">
+    {{range .Data.Jobs}}
+    <div class="recent-row">
+      <a href="/admin/jobs">{{.ID}}</a>
+      <span>{{.Name}}</span>
+      <strong>{{.Status}}</strong>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}

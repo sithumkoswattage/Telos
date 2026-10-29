@@ -1,0 +1,39 @@
+{{define "content"}}
+<h1>Monitoring</h1>
+{{template "monitoring-tabs" .}}
+
+<div class="resource-cards">
+  {{range .Data.Cards}}
+  <div class="resource-card">
+    <span>{{.Label}}</span>
+    <strong>{{.Value}}</strong>
+    <div class="bar wide"><i style="width: {{.Percent}}%"></i></div>
+    <small>{{.Caption}}</small>
+  </div>
+  {{end}}
+</div>
+
+<div class="panel">
+  <h3>Usage by worker</h3>
+  <table class="usage-table">
+    <thead>
+      <tr>
+        <th>Worker</th><th>Status</th><th>CPU</th>
+        <th>Memory</th><th>Disk</th><th>Network</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Workers}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td><span class="pill {{.StatusClass}}">{{.Status}}</span></td>
+        <td><div class="bar-cell"><div class="bar"><i style="width: {{.CPU}}%"></i></div><span>{{.CPU}}%</span></div></td>
+        <td><div class="bar-cell"><div class="bar"><i style="width: {{.Memory}}%"></i></div><span>{{.Memory}}%</span></div></td>
+        <td><div class="bar-cell"><div class="bar"><i style="width: {{.Disk}}%"></i></div><span>{{.Disk}}%</span></div></td>
+        <td>{{.Network}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}

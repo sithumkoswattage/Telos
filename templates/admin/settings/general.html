@@ -1,0 +1,29 @@
+{{define "content"}}
+<h1>System Settings</h1>
+{{template "settings-tabs" .}}
+
+<form class="card settings-card" method="post">
+  <label for="system-name">System name</label>
+  <input type="text" id="system-name" name="system_name" value="Telos">
+
+  <label for="max-jobs">Max concurrent jobs</label>
+  <input type="number" id="max-jobs" name="max_jobs" value="100">
+
+  <label for="default-queue">Default queue</label>
+  <input type="text" id="default-queue" name="default_queue" value="default">
+
+  <label for="algorithm">Scheduling algorithm</label>
+  <select id="algorithm" name="algorithm">
+    <option selected>Round Robin</option>
+    <option>Priority Based</option>
+    <option>First Come First Served</option>
+  </select>
+
+  <label class="switch">
+    <input type="checkbox" name="auto_scaling" checked>
+    <span>Enable auto scaling</span>
+  </label>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+{{end}}

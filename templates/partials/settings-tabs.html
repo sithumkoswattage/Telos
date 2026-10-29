@@ -1,0 +1,9 @@
+{{define "settings-tabs"}}
+<div class="tabs small">
+  <a href="/admin/settings/general"       class="{{if eq .Active "general"}}active{{end}}">General</a>
+  <a href="/admin/settings/workers"       class="{{if eq .Active "workers"}}active{{end}}">Workers</a>
+  <a href="/admin/settings/queues"        class="{{if eq .Active "queues"}}active{{end}}">Queues</a>
+  <a href="/admin/settings/security"      class="{{if eq .Active "security"}}active{{end}}">Security</a>
+  <a href="/admin/settings/notifications" class="{{if eq .Active "notifications"}}active{{end}}">Notifications</a>
+</div>
+{{end}}

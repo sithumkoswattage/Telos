@@ -1,0 +1,7 @@
+{{define "monitoring-tabs"}}
+<div class="tabs small">
+  <a href="/admin/monitoring/overview"    class="{{if eq .Active "overview"}}active{{end}}">System Overview</a>
+  <a href="/admin/monitoring/resources"   class="{{if eq .Active "resources"}}active{{end}}">Resource Usage</a>
+  <a href="/admin/monitoring/performance" class="{{if eq .Active "performance"}}active{{end}}">Job Performance</a>
+</div>
+{{end}}

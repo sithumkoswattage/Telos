@@ -1,0 +1,17 @@
+{{define "content"}}
+<h1>Monitoring</h1>
+{{template "monitoring-tabs" .}}
+
+<div class="metrics">
+  {{range .Data.Metrics}}
+  <div class="metric">
+    <span>{{.Label}}</span>
+    <strong>{{.Value}}</strong>
+    <svg class="spark" viewBox="0 0 400 100" preserveAspectRatio="none">
+      <polyline fill="none" stroke="{{.Color}}" stroke-width="2" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke" points="{{.Points}}"/>
+    </svg>
+  </div>
+  {{end}}
+</div>
+{{end}}

@@ -1,0 +1,46 @@
+{{define "content"}}
+<h1>Monitoring</h1>
+{{template "monitoring-tabs" .}}
+
+<div class="resource-cards">
+  {{range .Data.Cards}}
+  <div class="resource-card perf">
+    <span>{{.Label}}</span>
+    <strong>{{.Value}}</strong>
+    <small class="trend {{.TrendClass}}">{{.Trend}}</small>
+  </div>
+  {{end}}
+</div>
+
+<div class="perf-charts">
+
+  <div class="panel">
+    <h3>Jobs completed per hour</h3>
+    <p class="sub">Last 12 hours</p>
+    <div class="hbars">
+      {{range .Data.Hours}}
+      <div class="hcol">
+        <span class="hval">{{.Value}}</span>
+        <div class="hbar {{if .Current}}current{{end}}" style="height: {{.Height}}px"></div>
+        <span class="hlab">{{.Hour}}</span>
+      </div>
+      {{end}}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Average duration by queue</h3>
+    <p class="sub">All jobs, last 7 days</p>
+    <div class="dur-list">
+      {{range .Data.Queues}}
+      <div class="dur-row">
+        <span>{{.Name}}</span>
+        <div class="bar wide"><i style="width: {{.Percent}}%"></i></div>
+        <strong>{{.Duration}}</strong>
+      </div>
+      {{end}}
+    </div>
+  </div>
+
+</div>
+{{end}}

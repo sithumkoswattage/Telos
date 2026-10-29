@@ -1,0 +1,29 @@
+{{define "content"}}
+<h1>System Settings</h1>
+{{template "settings-tabs" .}}
+
+<form class="card settings-card" method="post">
+  <label for="session-timeout">Session timeout (minutes)</label>
+  <input type="number" id="session-timeout" name="session_timeout" value="30">
+
+  <label for="min-password">Minimum password length</label>
+  <input type="number" id="min-password" name="min_password" value="8">
+
+  <label class="switch">
+    <input type="checkbox" name="two_factor">
+    <span>Require two-factor authentication</span>
+  </label>
+
+  <label class="switch tight">
+    <input type="checkbox" name="social_signin" checked>
+    <span>Allow Google and GitHub sign-in</span>
+  </label>
+
+  <label class="switch tight">
+    <input type="checkbox" name="worker_token" checked>
+    <span>Require token for worker nodes</span>
+  </label>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+{{end}}

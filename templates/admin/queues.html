@@ -1,0 +1,34 @@
+{{define "content"}}
+<div class="page-head center">
+  <h1>Queues</h1>
+  <a href="#" class="btn">+ Create Queue</a>
+</div>
+
+<div class="panel">
+  <table class="queues-table">
+    <thead>
+      <tr>
+        <th>Queue name</th><th>Priority</th><th>Pending jobs</th>
+        <th>Workers</th><th>Scheduling</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Queues}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td><span class="pill {{.PriorityClass}}">{{.Priority}}</span></td>
+        <td>{{.Pending}}</td>
+        <td>{{.Workers}}</td>
+        <td>{{.Scheduling}}</td>
+        <td><a href="#" class="more">···</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel note">
+  <h3>How jobs are picked</h3>
+  <p>Higher-priority queues are served first. Within a queue, jobs are handed to available workers in Round Robin order, so no single worker is overloaded.</p>
+</div>
+{{end}}

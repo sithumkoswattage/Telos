@@ -1,0 +1,38 @@
+{{define "content"}}
+<h1>System Settings</h1>
+{{template "settings-tabs" .}}
+
+<form class="card notify-card" method="post">
+
+  <div class="notify-row">
+    <div>
+      <strong>Job failure alerts</strong>
+      <small>Notify when a job fails</small>
+    </div>
+    <label class="switch"><input type="checkbox" name="job_failure" checked></label>
+  </div>
+
+  <div class="notify-row">
+    <div>
+      <strong>Worker offline alerts</strong>
+      <small>Notify when a worker goes offline</small>
+    </div>
+    <label class="switch"><input type="checkbox" name="worker_offline" checked></label>
+  </div>
+
+  <div class="notify-row">
+    <div>
+      <strong>Queue threshold alerts</strong>
+      <small>Notify when queue length exceeds limit</small>
+    </div>
+    <label class="switch"><input type="checkbox" name="queue_threshold"></label>
+  </div>
+
+  <div class="notify-email">
+    <label for="notify-email">Email address</label>
+    <input type="email" id="notify-email" name="email" value="admin@telos.lk">
+  </div>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+{{end}}

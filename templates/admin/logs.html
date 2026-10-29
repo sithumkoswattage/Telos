@@ -1,0 +1,35 @@
+{{define "content"}}
+<h1>Logs</h1>
+
+<div class="panel">
+  <form class="filters" method="get" action="/admin/logs">
+    <select name="level" onchange="this.form.submit()">
+      <option value="">All Levels</option>
+      <option value="INFO"  {{if eq .Data.Level "INFO"}}selected{{end}}>INFO</option>
+      <option value="WARN"  {{if eq .Data.Level "WARN"}}selected{{end}}>WARN</option>
+      <option value="ERROR" {{if eq .Data.Level "ERROR"}}selected{{end}}>ERROR</option>
+    </select>
+
+    <input type="text" name="q" value="{{.Data.Query}}" placeholder="Search logs...">
+
+    {{if .Data.Filtered}}<a href="/admin/logs" class="clear">Clear</a>{{end}}
+  </form>
+
+  <table class="logs-table">
+    <thead>
+      <tr><th>Time</th><th>Level</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      {{range .Data.Logs}}
+      <tr>
+        <td>{{.Time}}</td>
+        <td><span class="pill level {{.LevelClass}}">{{.Level}}</span></td>
+        <td>{{.Message}}</td>
+      </tr>
+      {{else}}
+      <tr><td colspan="3" class="empty">No log entries match your filters.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}

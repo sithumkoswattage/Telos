@@ -1,0 +1,36 @@
+{{define "content"}}
+<h1>Workers</h1>
+
+<div class="stats">
+  {{range .Data.Stats}}
+  <div class="stat">
+    <span>{{.Label}}</span>
+    <strong>{{.Value}}</strong>
+  </div>
+  {{end}}
+</div>
+
+<div class="panel">
+  <table class="workers-table">
+    <thead>
+      <tr>
+        <th>Worker</th><th>Host</th><th>CPU</th><th>Memory</th>
+        <th>Status</th><th>Current job</th><th>Last seen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Workers}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Host}}</td>
+        <td><div class="bar"><i style="width: {{.CPU}}%"></i></div></td>
+        <td><div class="bar"><i style="width: {{.Memory}}%"></i></div></td>
+        <td><span class="pill {{.StatusClass}}">{{.Status}}</span></td>
+        <td>{{.Job}}</td>
+        <td>{{.LastSeen}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}

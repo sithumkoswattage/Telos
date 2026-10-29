@@ -1,0 +1,27 @@
+{{define "content"}}
+<h1>System Settings</h1>
+{{template "settings-tabs" .}}
+
+<form class="card settings-card" method="post">
+  <label for="heartbeat">Heartbeat interval (seconds)</label>
+  <input type="number" id="heartbeat" name="heartbeat" value="10">
+
+  <label for="timeout">Worker timeout (seconds)</label>
+  <input type="number" id="timeout" name="timeout" value="30">
+
+  <label for="max-jobs">Max concurrent jobs per worker</label>
+  <input type="number" id="max-jobs" name="max_jobs_per_worker" value="5">
+
+  <label class="switch">
+    <input type="checkbox" name="auto_register" checked>
+    <span>Auto-register new workers</span>
+  </label>
+
+  <label class="switch tight">
+    <input type="checkbox" name="auto_restart" checked>
+    <span>Auto-restart failed workers</span>
+  </label>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+{{end}}
