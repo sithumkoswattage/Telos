@@ -1,4 +1,26 @@
 {{define "content"}}
-<h1>Worker Dashboard</h1>
-<p>Content goes here.</p>
+<div class="job-head">
+  <h1>Worker Dashboard</h1>
+  <span class="pill {{.Data.StatusClass}}">{{.Data.Status}}</span>
+</div>
+
+<div class="stats worker-stats">
+  {{range .Data.Stats}}
+  <div class="stat"><span>{{.Label}}</span><strong>{{.Value}}</strong></div>
+  {{end}}
+</div>
+
+<div class="panel">
+  <h3>Current Task</h3>
+  <div class="task-line">
+    <span>Job {{.Data.TaskID}} · {{.Data.TaskName}}</span>
+    <strong>{{.Data.Percent}}%</strong>
+  </div>
+  <div class="bar wide thick"><i style="width: {{.Data.Percent}}%"></i></div>
+  <div class="job-meta">
+    <span>Started: <strong>{{.Data.Started}}</strong></span>
+    <span>Duration: <strong>{{.Data.Duration}}</strong></span>
+    <span>Status: <strong>{{.Data.TaskStatus}}</strong></span>
+  </div>
+</div>
 {{end}}

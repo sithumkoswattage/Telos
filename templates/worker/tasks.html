@@ -1,4 +1,30 @@
 {{define "content"}}
-<h1>Worker Tasks</h1>
-<p>Content goes here.</p>
+<h1>Assigned Tasks</h1>
+
+<div class="panel">
+  <div class="tabs small">
+    <a href="/worker/tasks?tab=current"   class="{{if eq .Data.Tab "current"}}active{{end}}">Current</a>
+    <a href="/worker/tasks?tab=completed" class="{{if eq .Data.Tab "completed"}}active{{end}}">Completed</a>
+    <a href="/worker/tasks?tab=failed"    class="{{if eq .Data.Tab "failed"}}active{{end}}">Failed</a>
+  </div>
+
+  <table class="tasks-table">
+    <thead>
+      <tr><th>ID</th><th>Job name</th><th>Queue</th><th>Status</th><th>Started</th></tr>
+    </thead>
+    <tbody>
+      {{range .Data.Tasks}}
+      <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Queue}}</td>
+        <td><span class="pill {{.StatusClass}}">{{.Status}}</span></td>
+        <td>{{.Started}}</td>
+      </tr>
+      {{else}}
+      <tr><td colspan="5" class="empty">No tasks in this list.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
 {{end}}

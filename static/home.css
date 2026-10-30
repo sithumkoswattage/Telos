@@ -1,0 +1,125 @@
+:root {
+  --bg: #effbf5;
+  --text: #0f2e2b;
+  --muted: #4a6460;
+  --teal: #0f766e;
+  --mint: #5fe0a0;
+  --line: #dcefe7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+}
+
+.home { max-width: 1120px; margin: 0 auto; padding: 0 40px 64px; }
+
+/* ---------- Nav ---------- */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+}
+.nav-brand svg { width: 28px; height: 28px; }
+.nav-actions { display: flex; gap: 10px; }
+
+/* ---------- Buttons ---------- */
+.h-btn {
+  display: inline-block;
+  padding: 11px 20px;
+  border: 1px solid var(--mint);
+  border-radius: 10px;
+  background: var(--mint);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+.h-btn:hover { filter: brightness(0.95); }
+.h-btn.ghost { background: white; border-color: #d3e7de; }
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  margin-top: 28px;
+}
+.badge-pill {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #a7f5cc;
+  color: #0b3d2e;
+  font-size: 10px;
+  font-weight: 600;
+}
+.hero h1 {
+  margin: 24px 0 20px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.hero p {
+  max-width: 480px;
+  margin: 0 0 24px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.hero-actions { display: flex; gap: 10px; }
+
+.hero-art {
+  overflow: hidden;
+  border-radius: 20px;
+  background: #0b2e2b;
+}
+.hero-art svg { display: block; width: 100%; height: auto; }
+
+/* ---------- Features ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+}
+.feature {
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+}
+.feature::before {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 3px;
+  margin-bottom: 14px;
+  border-radius: 2px;
+  background: var(--mint);
+}
+.feature h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+.feature p { margin: 0; font-size: 11px; line-height: 1.6; color: var(--muted); }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 900px) {
+  .home { padding: 0 20px 48px; }
+  .hero { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 32px; }
+  .features { grid-template-columns: 1fr; }
+}

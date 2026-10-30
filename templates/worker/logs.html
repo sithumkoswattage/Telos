@@ -1,0 +1,32 @@
+{{define "content"}}
+<div class="page-head center">
+  <h1>Logs</h1>
+  <form method="get" action="/worker/logs">
+    <select name="level" class="range-select" onchange="this.form.submit()">
+      <option value="">All Levels</option>
+      <option value="INFO"  {{if eq .Data.Level "INFO"}}selected{{end}}>INFO</option>
+      <option value="WARN"  {{if eq .Data.Level "WARN"}}selected{{end}}>WARN</option>
+      <option value="ERROR" {{if eq .Data.Level "ERROR"}}selected{{end}}>ERROR</option>
+    </select>
+  </form>
+</div>
+
+<div class="panel">
+  <table class="logs-table">
+    <thead>
+      <tr><th>Time</th><th>Level</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      {{range .Data.Logs}}
+      <tr>
+        <td>{{.Time}}</td>
+        <td><span class="pill level {{.LevelClass}}">{{.Level}}</span></td>
+        <td>{{.Message}}</td>
+      </tr>
+      {{else}}
+      <tr><td colspan="3" class="empty">No log entries for this level.</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}

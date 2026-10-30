@@ -1,0 +1,29 @@
+{{define "content"}}
+<div class="job-head">
+  <h1>Job Results</h1>
+  <span class="pill {{.Data.StatusClass}}">{{.Data.Status}}</span>
+</div>
+<p class="results-sub">{{.Data.ID}} · {{.Data.Name}} · Completed {{.Data.Completed}}</p>
+
+<div class="results-grid">
+
+  <div class="panel">
+    <h3>Output Files</h3>
+    {{range .Data.Files}}
+    <div class="file-row">
+      <span>{{.Name}}</span>
+      <a href="#" class="btn ghost small">Download</a>
+    </div>
+    {{end}}
+    <a href="#" class="btn small dl-all">Download All</a>
+  </div>
+
+  <div class="panel">
+    <h3>Job Summary</h3>
+    {{range .Data.Summary}}
+    <div class="summary-row"><span>{{.Label}}</span><strong>{{.Value}}</strong></div>
+    {{end}}
+  </div>
+
+</div>
+{{end}}

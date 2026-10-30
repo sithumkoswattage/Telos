@@ -1,4 +1,40 @@
 {{define "content"}}
-<h1>User Dashboard</h1>
-<p>Content goes here.</p>
+<div class="page-head">
+  <div>
+    <h1>Welcome back!</h1>
+    <p>Submit your jobs and track their progress.</p>
+  </div>
+  <a href="/user/submit-job" class="btn">+ Submit Job Request</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><span>Total Jobs</span><strong>{{.Data.Total}}</strong></div>
+  <div class="stat completed"><span>Completed</span><strong>{{.Data.Completed}}</strong></div>
+  <div class="stat processing"><span>Processing</span><strong>{{.Data.Processing}}</strong></div>
+  <div class="stat failed"><span>Failed</span><strong>{{.Data.Failed}}</strong></div>
+</div>
+
+<div class="panel">
+  <h3>Recent Jobs</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Status</th>
+        <th>Submitted</th><th>Actions</th><th>Percentage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Data.Jobs}}
+      <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Name}}</td>
+        <td><span class="badge {{.Class}}">{{.Status}}</span></td>
+        <td>{{.Submitted}}</td>
+        <td><a href="{{.ActionURL}}">{{.Action}}</a></td>
+        <td>{{.Percent}}%</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
 {{end}}

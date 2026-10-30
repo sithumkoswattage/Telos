@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{if .Signup}}Create Account{{else}}Sign In{{end}} - Telos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/login.css?v=2">
+</head>
+<body>
+  <div class="login-page">
+
+    <section class="login-brand">
+      <svg class="logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="28" stroke="#6ee7a8" stroke-width="2"/>
+        <path d="M30 18 L20 38 H40 Z" stroke="#6ee7a8" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="30" cy="18" r="4" fill="#a7f3d0"/>
+        <circle cx="20" cy="38" r="4" fill="#a7f3d0"/>
+        <circle cx="40" cy="38" r="4" fill="#a7f3d0"/>
+      </svg>
+      <h1>Telos</h1>
+      <p class="tagline">Distributed Job Processing Platform</p>
+      <h2 class="slogan">Get your work done with distributed power.</h2>
+    </section>
+
+    <section class="login-form-side">
+      <form class="login-form" method="post" action="{{if .Signup}}/user/signup{{else}}/user/login{{end}}">
+        <h2>{{if .Signup}}Create Account{{else}}Sign In{{end}}</h2>
+        <p class="welcome">{{if .Signup}}Join Telos{{else}}Welcome back!{{end}}</p>
+
+        {{if .Signup}}
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" placeholder="Your name" required>
+        {{end}}
+
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="{{if .Signup}}Create a password{{else}}Enter your password{{end}}" required>
+
+        {{if not .Signup}}<a href="#" class="forgot">Forgot password?</a>{{end}}
+
+        <button type="submit" class="btn-signin {{if .Signup}}spaced{{end}}">
+          {{if .Signup}}Sign Up{{else}}Sign In{{end}}
+        </button>
+
+        <p class="or">or continue with</p>
+        <div class="social">
+          <button type="button" class="btn-social">Google</button>
+          <button type="button" class="btn-social">GitHub</button>
+        </div>
+
+        <p class="switch-link">
+          {{if .Signup}}Already have an account? <a href="/user/login">Sign In</a>
+          {{else}}Don't have an account? <a href="/user/signup">Sign Up</a>{{end}}
+        </p>
+      </form>
+    </section>
+
+  </div>
+</body>
+</html>

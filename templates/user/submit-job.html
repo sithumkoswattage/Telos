@@ -1,4 +1,55 @@
 {{define "content"}}
-<h1>Submit Jobs</h1>
-<p>Content goes here.</p>
+<h1>Submit New Job</h1>
+
+<div class="steps">
+  {{range .Data.Steps}}
+  <div class="step {{if .Done}}done{{end}}"><i>{{.Num}}</i><span>{{.Label}}</span></div>
+  {{end}}
+</div>
+
+{{if eq .Data.Step 1}}
+<div class="card settings-card">
+  <label for="job-name">Job name</label>
+  <input type="text" id="job-name" value="Image Processing Job">
+
+  <label for="queue">Queue</label>
+  <select id="queue">
+    {{range .Data.Queues}}<option {{if eq . "image-processing"}}selected{{end}}>{{.}}</option>{{end}}
+  </select>
+
+  <label>Priority</label>
+  <div class="radios">
+    <label class="radio"><input type="radio" name="priority" value="high"> High</label>
+    <label class="radio"><input type="radio" name="priority" value="normal" checked> Normal</label>
+    <label class="radio"><input type="radio" name="priority" value="low"> Low</label>
+  </div>
+
+  <label for="file">Input file</label>
+  <div class="dropzone">
+    <strong>Drag &amp; drop files here, or click to upload</strong>
+    <small>Supported formats: .zip, .tar, .png, .jpg (max 500 MB)</small>
+    <input type="file" id="file" accept=".zip,.tar,.png,.jpg">
+  </div>
+
+  <a href="/user/submit-job?step=2" class="btn">Next →</a>
+</div>
+
+{{else if eq .Data.Step 2}}
+<div class="card settings-card">
+  <p class="empty-note">Input settings for the job will go here.</p>
+  <div class="wiz-actions">
+    <a href="/user/submit-job?step=1" class="btn ghost">← Back</a>
+    <a href="/user/submit-job?step=3" class="btn">Next →</a>
+  </div>
+</div>
+
+{{else}}
+<div class="card settings-card">
+  <p class="empty-note">A summary of the job will go here for review before submitting.</p>
+  <div class="wiz-actions">
+    <a href="/user/submit-job?step=2" class="btn ghost">← Back</a>
+    <a href="/user/job-details" class="btn">Submit Job</a>
+  </div>
+</div>
+{{end}}
 {{end}}

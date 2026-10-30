@@ -207,6 +207,116 @@ type AdminLogsData struct {
 	Filtered bool   // true when any filter is active
 }
 
+// ---------- User job details data ----------
+
+type JobStep struct {
+	Num   int
+	Label string
+	Done  bool // finished steps are drawn in green
+}
+
+type JobLog struct {
+	Time    string
+	Message string
+}
+
+type JobDetailsData struct {
+	ID          string
+	Name        string
+	Status      string
+	StatusClass string // processing, completed or failed
+	Submitted   string
+	Percent     int
+	Queue       string
+	Worker      string
+	Elapsed     string
+	Steps       []JobStep
+	Logs        []JobLog
+	Tab         string // "logs" or "output"
+}
+
+// ---------- User submit job data ----------
+
+type SubmitJobData struct {
+	Step   int       // 1, 2 or 3
+	Steps  []JobStep // the three step circles at the top
+	Queues []string  // choices for the Queue dropdown
+}
+
+// ---------- User results data ----------
+
+type ResultFile struct {
+	Name string
+}
+
+type SummaryRow struct {
+	Label string
+	Value string
+}
+
+type JobResultsData struct {
+	ID          string
+	Name        string
+	Completed   string
+	Status      string
+	StatusClass string
+	Files       []ResultFile
+	Summary     []SummaryRow
+}
+
+// ---------- Worker dashboard data ----------
+
+type WorkerDashboardData struct {
+	Status      string
+	StatusClass string // online, busy or offline (pill colour)
+	Stats       []SimpleStat
+	TaskID      string
+	TaskName    string
+	Percent     int
+	Started     string
+	Duration    string
+	TaskStatus  string
+}
+
+// ---------- Worker assigned tasks data ----------
+
+type Task struct {
+	ID          string
+	Name        string
+	Queue       string
+	Status      string
+	StatusClass string // processing, completed or failed (pill colour)
+	Started     string
+}
+
+type WorkerTasksData struct {
+	Tab   string // current, completed or failed
+	Tasks []Task
+}
+
+// ---------- Worker resource usage data ----------
+
+type UsageChart struct {
+	Label  string
+	Value  string
+	Color  string // line colour
+	Points string // ready-made SVG points for the line
+}
+
+type WorkerResourcesData struct {
+	Range       string // 1h, 6h or 24h
+	Charts      []UsageChart
+	DiskValue   string
+	DiskPercent int // drives the bar length
+}
+
+// ---------- Worker logs data ----------
+
+type WorkerLogsData struct {
+	Level string // selected level ("" means all)
+	Logs  []LogEntry
+}
+
 // sparkline turns a list of readings into SVG points (400 wide, 100 high).
 // lo and hi are the lowest and highest value the chart should show.
 func sparkline(values []int, lo, hi int) string {
@@ -223,7 +333,7 @@ func sparkline(values []int, lo, hi int) string {
 	return b.String()
 }
 
-var initials = map[string]string{"admin": "AD", "user": "DU", "worker": "WK"}
+var initials = map[string]string{"admin": "AD", "user": "DU", "worker": "W3"}
 
 // render builds base.html + the role's sidebar + one page template
 func render(w http.ResponseWriter, r *http.Request, role, file string, p PageData) {
@@ -275,6 +385,20 @@ func loginPage(file string) http.HandlerFunc {
 	}
 }
 
+// authPage renders the user sign-in or sign-up page (standalone, no sidebar)
+func authPage(signup bool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tmpl, err := template.ParseFiles("templates/user/login.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := tmpl.Execute(w, struct{ Signup bool }{signup}); err != nil {
+			log.Println(err)
+		}
+	}
+}
+
 // userDashboard shows sample data for now; the database will replace it later
 func userDashboard(w http.ResponseWriter, r *http.Request) {
 	data := DashboardData{
@@ -288,6 +412,189 @@ func userDashboard(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	render(w, r, "user", "user/dashboard.html", PageData{Title: "Dashboard", Data: data})
+}
+
+// userJobDetails shows sample data for now; the database will replace it later
+func userJobDetails(w http.ResponseWriter, r *http.Request) {
+	tab := r.URL.Query().Get("tab")
+	if tab != "output" {
+		tab = "logs"
+	}
+	data := JobDetailsData{
+		ID: "#J-10432", Name: "Generate thumbnails",
+		Status: "Processing", StatusClass: "processing",
+		Submitted: "Oct 16, 14:32",
+		Percent:   60,
+		Queue:     "image-processing", Worker: "worker-3", Elapsed: "3m 24s",
+		Steps: []JobStep{
+			{1, "Submitted", true},
+			{2, "Queued", true},
+			{3, "Processing", true},
+			{4, "Completed", false},
+		},
+		Logs: []JobLog{
+			{"14:32", "Job started"},
+			{"14:36", "Processing chunk 1/10"},
+			{"14:38", "Processing chunk 2/10"},
+			{"14:40", "Processing chunk 3/10"},
+		},
+		Tab: tab,
+	}
+	render(w, r, "user", "user/job-details.html", PageData{Title: "Job Details", Data: data})
+}
+
+// userSubmitJob shows the 3-step form: /user/submit-job?step=1 (or 2, 3)
+func userSubmitJob(w http.ResponseWriter, r *http.Request) {
+	step := 1
+	switch r.URL.Query().Get("step") {
+	case "2":
+		step = 2
+	case "3":
+		step = 3
+	}
+
+	labels := []string{"Basic Info", "Input", "Review"}
+	steps := make([]JobStep, len(labels))
+	for i, l := range labels {
+		steps[i] = JobStep{Num: i + 1, Label: l, Done: i+1 <= step}
+	}
+
+	data := SubmitJobData{
+		Step:   step,
+		Steps:  steps,
+		Queues: []string{"image-processing", "data-analysis", "video-encoding", "email-sending", "default"},
+	}
+	render(w, r, "user", "user/submit-job.html", PageData{Title: "Submit New Job", Data: data})
+}
+
+// userResults shows sample data for now; the database will replace it later
+func userResults(w http.ResponseWriter, r *http.Request) {
+	data := JobResultsData{
+		ID: "#J-10432", Name: "Generate thumbnails",
+		Completed: "Oct 16, 14:42",
+		Status:    "Completed", StatusClass: "completed",
+		Files: []ResultFile{
+			{"thumbnails.zip"},
+			{"preview.jpg"},
+		},
+		Summary: []SummaryRow{
+			{"Queue", "image-processing"},
+			{"Worker", "worker-3"},
+			{"Duration", "10m 12s"},
+			{"Chunks processed", "10 / 10"},
+		},
+	}
+	render(w, r, "user", "user/results.html", PageData{Title: "Job Results", Data: data})
+}
+
+// workerDashboard shows sample data for now; real worker data will replace it later
+func workerDashboard(w http.ResponseWriter, r *http.Request) {
+	data := WorkerDashboardData{
+		Status: "Online", StatusClass: "online",
+		Stats: []SimpleStat{
+			{"CPU", "8%"},
+			{"Memory", "4%"},
+			{"Disk", "6%"},
+			{"Uptime", "12h 34m"},
+		},
+		TaskID: "#J-10432", TaskName: "Generate thumbnails",
+		Percent:    70,
+		Started:    "14:32",
+		Duration:   "6m 12s",
+		TaskStatus: "Processing",
+	}
+	render(w, r, "worker", "worker/dashboard.html", PageData{Title: "Worker Dashboard", Data: data})
+}
+
+// sample tasks for now; the scheduler will provide real ones later
+var allTasks = []Task{
+	{"#J-10432", "Generate thumbnails", "image-processing", "Processing", "processing", "14:32"},
+	{"#J-10428", "Process image", "image-processing", "Completed", "completed", "13:45"},
+	{"#J-10421", "Analyze dataset", "data-analysis", "Completed", "completed", "12:10"},
+	{"#J-10415", "Encode video", "video-encoding", "Completed", "completed", "10:22"},
+	{"#J-10403", "Send email", "email-sending", "Failed", "failed", "09:18"},
+}
+
+// workerTasks shows the worker's tasks: /worker/tasks?tab=current (or completed, failed)
+func workerTasks(w http.ResponseWriter, r *http.Request) {
+	tab := r.URL.Query().Get("tab")
+	if tab != "completed" && tab != "failed" {
+		tab = "current"
+	}
+
+	var shown []Task
+	for _, t := range allTasks {
+		switch tab {
+		case "completed":
+			if t.Status != "Completed" {
+				continue
+			}
+		case "failed":
+			if t.Status != "Failed" {
+				continue
+			}
+		}
+		shown = append(shown, t)
+	}
+
+	render(w, r, "worker", "worker/tasks.html",
+		PageData{Title: "Assigned Tasks", Data: WorkerTasksData{Tab: tab, Tasks: shown}})
+}
+
+// workerResources shows sample readings for now; the worker node will report real ones later.
+// The time range comes from the address: /worker/resources?range=6h
+func workerResources(w http.ResponseWriter, r *http.Request) {
+	rng := r.URL.Query().Get("range")
+	if rng != "6h" && rng != "24h" {
+		rng = "1h"
+	}
+
+	cpu := map[string][]int{
+		"1h":  {20, 28, 18, 34, 26, 40, 30, 44, 36, 48, 38, 46},
+		"6h":  {30, 34, 28, 40, 36, 32, 44, 38, 30, 36, 42, 34},
+		"24h": {18, 24, 30, 26, 38, 44, 40, 34, 28, 32, 36, 32},
+	}
+	mem := map[string][]int{
+		"1h":  {36, 37, 38, 39, 38, 40, 39, 41, 40, 42, 41, 42},
+		"6h":  {34, 36, 35, 38, 37, 39, 38, 40, 41, 40, 42, 43},
+		"24h": {32, 34, 36, 35, 38, 40, 39, 41, 40, 42, 44, 45},
+	}
+
+	data := WorkerResourcesData{
+		Range: rng,
+		Charts: []UsageChart{
+			{"CPU Usage", "32%", "#0d9488", sparkline(cpu[rng], 0, 60)},
+			{"Memory Usage", "45%", "#5fe0a0", sparkline(mem[rng], 30, 50)},
+		},
+		DiskValue:   "62%",
+		DiskPercent: 62,
+	}
+	render(w, r, "worker", "worker/resources.html", PageData{Title: "Resource Usage", Data: data})
+}
+
+// sample worker log lines for now; the worker node will report real ones later
+var workerLogLines = []LogEntry{
+	{"14:32", "INFO", "info", "Task started: #J-10432"},
+	{"14:36", "INFO", "info", "Processing chunk 1/10"},
+	{"14:38", "INFO", "info", "Processing chunk 2/10"},
+	{"14:40", "INFO", "info", "Processing chunk 3/10"},
+	{"14:42", "INFO", "info", "Task completed"},
+}
+
+// workerLogs shows the worker's log lines: /worker/logs?level=INFO (or WARN, ERROR)
+func workerLogs(w http.ResponseWriter, r *http.Request) {
+	level := r.URL.Query().Get("level")
+
+	var shown []LogEntry
+	for _, l := range workerLogLines {
+		if level != "" && l.Level != level {
+			continue
+		}
+		shown = append(shown, l)
+	}
+
+	render(w, r, "worker", "worker/logs.html",
+		PageData{Title: "Logs", Data: WorkerLogsData{Level: level, Logs: shown}})
 }
 
 // adminDashboard shows sample data for now; the database will replace it later
@@ -508,9 +815,10 @@ func adminLogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Public pages (no sidebar)
-	http.HandleFunc("/{$}", page("Home", "none", "home.html"))
-	http.HandleFunc("/login", page("Login", "none", "login.html"))
+	// Public pages
+	http.HandleFunc("/{$}", loginPage("home.html"))
+	http.Handle("/login", http.RedirectHandler("/choose-role", http.StatusFound))
+	http.HandleFunc("/choose-role", loginPage("choose-role.html"))
 
 	// Admin login (standalone page)
 	http.HandleFunc("GET /admin/login", loginPage("admin/login.html"))
@@ -540,17 +848,29 @@ func main() {
 	http.HandleFunc("/admin/settings/notifications", settingsPage("System Settings", "notifications", "admin/settings/notifications.html"))
 
 	// User
+	http.HandleFunc("GET /user/login", authPage(false))
+	http.HandleFunc("GET /user/signup", authPage(true))
+
+	// Temporary: real authentication comes later. For now, both buttons just open the dashboard.
+	http.Handle("POST /user/login", http.RedirectHandler("/user/dashboard", http.StatusSeeOther))
+	http.Handle("POST /user/signup", http.RedirectHandler("/user/dashboard", http.StatusSeeOther))
 	http.Handle("/user/{$}", http.RedirectHandler("/user/dashboard", http.StatusFound))
 	http.HandleFunc("/user/dashboard", userDashboard)
-	http.HandleFunc("/user/submit-job", page("Submit Job", "user", "user/submit-job.html"))
-	http.HandleFunc("/user/job-details", page("Job Details", "user", "user/job-details.html"))
-	http.HandleFunc("/user/results", page("Results", "user", "user/results.html"))
+	http.HandleFunc("/user/submit-job", userSubmitJob)
+	http.HandleFunc("/user/job-details", userJobDetails)
+	http.HandleFunc("/user/results", userResults)
 	http.HandleFunc("/user/my-jobs", page("My Jobs", "user", "user/my-jobs.html"))
+
+	// Worker Login routes
+	http.HandleFunc("GET /worker/login", loginPage("worker/login.html"))
+	http.Handle("POST /worker/login", http.RedirectHandler("/worker/dashboard", http.StatusSeeOther))
 
 	// Worker
 	http.Handle("/worker/{$}", http.RedirectHandler("/worker/dashboard", http.StatusFound))
-	http.HandleFunc("/worker/dashboard", page("Worker Dashboard", "worker", "worker/dashboard.html"))
-	http.HandleFunc("/worker/tasks", page("Assigned Tasks", "worker", "worker/tasks.html"))
+	http.HandleFunc("/worker/dashboard", workerDashboard)
+	http.HandleFunc("/worker/tasks", workerTasks)
+	http.HandleFunc("/worker/resources", workerResources)
+	http.HandleFunc("/worker/logs", workerLogs)
 
 	// CSS and images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

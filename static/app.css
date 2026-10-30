@@ -601,3 +601,193 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
 
 /* Logs: empty result message */
 .logs-table td.empty { padding: 28px 8px; text-align: center; color: var(--muted); }
+
+/* User dashboard: Processing badge is teal, like in Figma */
+.badge.processing { background: #bfe9e6; color: #0f5f5a; }
+
+/* ================= User: job details ================= */
+.job-head { display: flex; justify-content: space-between; align-items: center; }
+.job-head h1 { margin: 0; }
+.job-sub { margin: 14px 0 2px; font-size: 11px; color: var(--muted); }
+.job-title { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.job-title h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.pill.big { padding: 6px 16px; font-size: 14px; }
+
+.steps { display: flex; gap: 28px; margin-bottom: 18px; }
+.step { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.step i {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e1efea;
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+.step.done { color: var(--text); font-weight: 600; }
+.step.done i { background: #5fe0a0; color: #0b3d2e; }
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.progress-row strong { color: var(--text); }
+.bar.thick { height: 9px; }
+
+.job-meta { display: flex; gap: 32px; margin-top: 16px; font-size: 11px; color: var(--muted); }
+.job-meta strong { color: var(--text); font-weight: 600; }
+
+.job-tabs-panel { margin-top: 16px; }
+.job-tabs-panel .tabs { margin-top: 0; }
+.job-logs th { padding: 12px 8px; font-weight: 600; color: #3d5a55; }
+.job-logs td { padding: 13px 8px; font-size: 12px; }
+.job-logs th:first-child, .job-logs td:first-child { width: 110px; }
+.empty-note { margin: 24px 8px; font-size: 12px; color: var(--muted); }
+
+/* ================= User: submit job ================= */
+.radios { display: flex; gap: 22px; margin-top: 2px; }
+.card.settings-card label.radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  cursor: pointer;
+}
+.radio input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1.5px solid #9fc4b8;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+}
+.radio input:checked {
+  border-color: #0d9488;
+  background: #0d9488;
+  box-shadow: inset 0 0 0 3px white;
+}
+
+/* Dashed upload box: the real file input covers it, so click and drag-and-drop both work */
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 96px;
+  border: 2px dashed #5fe0a0;
+  border-radius: 12px;
+  background: #f4fdf9;
+  text-align: center;
+}
+.dropzone strong { font-size: 12px; font-weight: 600; }
+.dropzone small { font-size: 10px; color: var(--muted); }
+.dropzone input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.wiz-actions { display: flex; gap: 10px; }
+.btn.ghost { background: white; border: 1px solid #cfe5dc; }
+
+/* ================= User: results ================= */
+.results-sub { margin: 4px 0 18px; font-size: 11px; color: var(--muted); }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.btn.small { padding: 8px 16px; font-size: 11px; }
+
+.file-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eef3f1;
+  font-size: 12px;
+}
+.results-grid .btn.dl-all { margin-top: 18px; }
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eef3f1;
+  font-size: 11px;
+  color: var(--muted);
+}
+.summary-row strong { color: var(--text); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+.btn.ghost { background: white; border: 1px solid #cfe5dc; }
+
+/* ================= Worker dashboard ================= */
+.worker-stats { margin: 18px 0 16px; }
+.task-line {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.task-line strong { color: var(--text); font-weight: 600; }
+
+/* ================= Worker: assigned tasks ================= */
+.tasks-table th { padding: 12px 8px; font-weight: 600; color: #3d5a55; }
+.tasks-table td { padding: 13px 8px; font-size: 11px; }
+.tasks-table td.empty { padding: 28px 8px; text-align: center; color: var(--muted); }
+
+/* ================= Worker: resource usage ================= */
+.range-select {
+  padding: 9px 14px;
+  border: 1px solid #cfe5dc;
+  border-radius: 10px;
+  background: white;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.usage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.usage-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+}
+.usage-head strong { color: var(--text); font-weight: 600; }
+.usage-card .spark { height: 110px; margin-top: 22px; }
+.disk-bar { margin-top: 14px; }
+
+@media (max-width: 900px) {
+  .usage-grid { grid-template-columns: 1fr; }
+}

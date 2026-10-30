@@ -1,9 +1,15 @@
 {{define "sidebar"}}
 <aside class="sidebar">
-  <h2>Telos Worker</h2>
+  <div class="brand">{{template "logo"}}<span>Telos</span></div>
   <nav>
-    <a href="/worker/dashboard">Dashboard</a>
-    <a href="/worker/tasks">Assigned Tasks</a>
+    <a href="/worker/dashboard" class="{{if eq .Section "dashboard"}}active{{end}}">Dashboard</a>
+    <a href="/worker/tasks"     class="{{if eq .Section "tasks"}}active{{end}}">Assigned Tasks</a>
+    <a href="/worker/resources" class="{{if eq .Section "resources"}}active{{end}}">Resource Usage</a>
+    <a href="/worker/logs"      class="{{if eq .Section "logs"}}active{{end}}">Logs</a>
   </nav>
+  <div class="sidebar-user">
+    <div class="avatar">W3</div>
+    <div class="who"><strong>worker-3</strong><small>Worker node</small></div>
+  </div>
 </aside>
 {{end}}

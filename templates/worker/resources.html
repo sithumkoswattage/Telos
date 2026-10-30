@@ -1,0 +1,29 @@
+{{define "content"}}
+<div class="page-head center">
+  <h1>Resource Usage</h1>
+  <form method="get" action="/worker/resources">
+    <select name="range" class="range-select" onchange="this.form.submit()">
+      <option value="1h"  {{if eq .Data.Range "1h"}}selected{{end}}>Last 1 hour</option>
+      <option value="6h"  {{if eq .Data.Range "6h"}}selected{{end}}>Last 6 hours</option>
+      <option value="24h" {{if eq .Data.Range "24h"}}selected{{end}}>Last 24 hours</option>
+    </select>
+  </form>
+</div>
+
+<div class="usage-grid">
+  {{range .Data.Charts}}
+  <div class="panel usage-card">
+    <div class="usage-head"><span>{{.Label}}</span><strong>{{.Value}}</strong></div>
+    <svg class="spark" viewBox="0 0 400 100" preserveAspectRatio="none">
+      <polyline fill="none" stroke="{{.Color}}" stroke-width="2" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke" points="{{.Points}}"/>
+    </svg>
+  </div>
+  {{end}}
+</div>
+
+<div class="panel">
+  <div class="usage-head"><span>Disk Usage</span><strong>{{.Data.DiskValue}}</strong></div>
+  <div class="bar wide thick disk-bar"><i style="width: {{.Data.DiskPercent}}%"></i></div>
+</div>
+{{end}}

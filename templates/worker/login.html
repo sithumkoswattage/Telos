@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker Sign In - Telos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/login.css?v=3">
+</head>
+<body>
+  <div class="login-page">
+
+    <section class="login-brand">
+      <svg class="logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="28" stroke="#6ee7a8" stroke-width="2"/>
+        <path d="M30 18 L20 38 H40 Z" stroke="#6ee7a8" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="30" cy="18" r="4" fill="#a7f3d0"/>
+        <circle cx="20" cy="38" r="4" fill="#a7f3d0"/>
+        <circle cx="40" cy="38" r="4" fill="#a7f3d0"/>
+      </svg>
+      <h1>Telos</h1>
+      <p class="tagline">Distributed Job Processing Platform</p>
+      <h2 class="slogan">Get your work done with distributed power.</h2>
+    </section>
+
+    <section class="login-form-side">
+      <form class="login-form" method="post" action="/worker/login">
+        <h2>Sign In</h2>
+        <p class="welcome">Access your worker node</p>
+
+        <label for="worker-id">Worker ID</label>
+        <input type="text" id="worker-id" name="worker_id" placeholder="worker-3" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+        <button type="submit" class="btn-signin spaced">Sign In</button>
+      </form>
+    </section>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{{define "content"}}
+<div class="job-head">
+  <h1>Job Details</h1>
+  <span class="pill {{.Data.StatusClass}}">{{.Data.Status}}</span>
+</div>
+
+<p class="job-sub">Submitted {{.Data.Submitted}}</p>
+<div class="job-title">
+  <h2>{{.Data.ID}} - {{.Data.Name}}</h2>
+  <span class="pill big {{.Data.StatusClass}}">{{.Data.Status}}</span>
+</div>
+
+<div class="panel">
+  <div class="steps">
+    {{range .Data.Steps}}
+    <div class="step {{if .Done}}done{{end}}"><i>{{.Num}}</i><span>{{.Label}}</span></div>
+    {{end}}
+  </div>
+
+  <div class="progress-row"><span>Progress</span><strong>{{.Data.Percent}}%</strong></div>
+  <div class="bar wide thick"><i style="width: {{.Data.Percent}}%"></i></div>
+
+  <div class="job-meta">
+    <span>Queue: <strong>{{.Data.Queue}}</strong></span>
+    <span>Worker: <strong>{{.Data.Worker}}</strong></span>
+    <span>Elapsed: <strong>{{.Data.Elapsed}}</strong></span>
+  </div>
+</div>
+
+<div class="panel job-tabs-panel">
+  <div class="tabs small">
+    <a href="/user/job-details?tab=logs"   class="{{if eq .Data.Tab "logs"}}active{{end}}">Logs</a>
+    <a href="/user/job-details?tab=output" class="{{if eq .Data.Tab "output"}}active{{end}}">Output</a>
+  </div>
+
+  {{if eq .Data.Tab "logs"}}
+  <table class="job-logs">
+    <thead>
+      <tr><th>Time</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      {{range .Data.Logs}}
+      <tr><td>{{.Time}}</td><td>{{.Message}}</td></tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="empty-note">The output will appear here when the job is completed.</p>
+  {{end}}
+</div>
+{{end}}
