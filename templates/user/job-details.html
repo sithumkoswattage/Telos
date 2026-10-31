@@ -29,8 +29,7 @@
 
 <div class="panel job-tabs-panel">
   <div class="tabs small">
-    <a href="/user/job-details?tab=logs"   class="{{if eq .Data.Tab "logs"}}active{{end}}">Logs</a>
-    <a href="/user/job-details?tab=output" class="{{if eq .Data.Tab "output"}}active{{end}}">Output</a>
+    <a href="{{.Data.TabURL}}logs"   class="{{if eq .Data.Tab "logs"}}active{{end}}">Logs</a>
   </div>
 
   {{if eq .Data.Tab "logs"}}

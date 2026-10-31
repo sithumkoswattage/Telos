@@ -791,3 +791,14 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
 @media (max-width: 900px) {
   .usage-grid { grid-template-columns: 1fr; }
 }
+
+/* Job ID links in the admin jobs list */
+.jobs-table td a:hover { text-decoration: underline; }
+
+/* Sidebar brand is a link: keep it white, no underline, even after it was visited */
+.sidebar a.brand,
+.sidebar a.brand:visited {
+  color: white;
+  text-decoration: none;
+}
+.sidebar a.brand:hover { opacity: 0.85; }

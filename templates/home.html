@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Telos - Distributed Job Processing Platform</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/home.css?v=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/home.css?v=2">
 </head>
 <body>
   <div class="home">
 
+    <!-- Nav -->
     <header class="nav">
       <a href="/" class="nav-brand">
         <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,78 +22,149 @@
         </svg>
         <span>Telos</span>
       </a>
+      <nav class="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+      </nav>
       <div class="nav-actions">
-        <a href="/choose-role" class="h-btn ghost">Sign In</a>
-        <a href="/user/signup" class="h-btn">Get started</a>
+        <a href="/choose-role" class="h-btn ghost small">Sign in</a>
+        <a href="/user/signup" class="h-btn small">Get started →</a>
       </div>
     </header>
 
-    <section class="hero">
+    <!-- Hero -->
+    <section class="hero" id="platform">
       <div class="hero-text">
-        <span class="badge-pill">Distributed Job Processing Platform</span>
-        <h1>Run your jobs across many machines, in parallel.</h1>
-        <p>Telos lets you submit tasks, spreads them across a pool of worker nodes, and tracks every job from the queue to the final result.</p>
+        <span class="badge-pill">DISTRIBUTED JOB PROCESSING</span>
+        <h1>Put your computing jobs to <em>work.</em></h1>
+        <p>Submit tasks, distribute them across available worker nodes, and monitor execution from one clear workspace.</p>
         <div class="hero-actions">
-          <a href="/user/signup" class="h-btn">Get started</a>
-          <a href="/choose-role" class="h-btn ghost">Sign In</a>
+          <a href="/user/signup" class="h-btn">Get started →</a>
+          <a href="#how-it-works" class="h-btn ghost">See how it works</a>
         </div>
+        <p class="hero-note">A cleaner way to submit, distribute and track computational workloads.</p>
       </div>
 
-      <div class="hero-art">
-        <svg viewBox="0 0 492 386" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A central scheduler connected to six worker nodes">
-          <circle cx="246" cy="193" r="88" fill="none" stroke="#1d5c55" stroke-width="1" stroke-dasharray="3 4"/>
+      <div class="preview-wrap">
+        <div class="preview">
+          <div class="preview-bar">
+            <i></i><i></i><i></i>
+            <span>TELOS / WORKSPACE OVERVIEW</span>
+          </div>
+          <div class="preview-body">
+            <div class="preview-head">
+              <strong>Workspace overview</strong>
+              <span class="online-pill">SYSTEM ONLINE</span>
+            </div>
 
-          <g stroke="#3fae8a" stroke-width="1.5">
-            <line x1="246" y1="193" x2="246" y2="61"/>
-            <line x1="246" y1="193" x2="85"  y2="89"/>
-            <line x1="246" y1="193" x2="406" y2="89"/>
-            <line x1="246" y1="193" x2="85"  y2="298"/>
-            <line x1="246" y1="193" x2="406" y2="298"/>
-            <line x1="246" y1="193" x2="246" y2="326"/>
-          </g>
+            <div class="preview-stats">
+              <div><span>Active jobs</span><strong>24</strong><small>▲ 8% this hour</small></div>
+              <div><span>Available workers</span><strong>12</strong><small>● all healthy</small></div>
+              <div><span>Completed today</span><strong>186</strong><small>▲ 12% today</small></div>
+            </div>
 
-          <g fill="#0b2e2b" stroke="#6ee7a8" stroke-width="2">
-            <circle cx="246" cy="61"  r="15"/>
-            <circle cx="85"  cy="89"  r="15"/>
-            <circle cx="406" cy="89"  r="15"/>
-            <circle cx="85"  cy="298" r="15"/>
-            <circle cx="406" cy="298" r="15"/>
-            <circle cx="246" cy="326" r="15"/>
-          </g>
-          <g fill="#a7f3d0">
-            <circle cx="246" cy="61"  r="4"/>
-            <circle cx="85"  cy="89"  r="4"/>
-            <circle cx="406" cy="89"  r="4"/>
-            <circle cx="85"  cy="298" r="4"/>
-            <circle cx="406" cy="298" r="4"/>
-            <circle cx="246" cy="326" r="4"/>
-          </g>
+            <table class="mini-table">
+              <thead>
+                <tr><th>JOB</th><th>WORKER</th><th>STATUS</th><th>TIME</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>image-batch-042</td><td>worker-03</td><td><span class="dot run"></span>Running</td><td>02:14</td></tr>
+                <tr><td>report-build-084</td><td>worker-07</td><td><span class="dot done"></span>Completed</td><td>01:42</td></tr>
+                <tr><td>data-cleanup-017</td><td>—</td><td><span class="dot wait"></span>Queued</td><td>waiting</td></tr>
+                <tr><td>model-eval-033</td><td>worker-05</td><td><span class="dot run"></span>Running</td><td>03:36</td></tr>
+              </tbody>
+            </table>
 
-          <circle cx="246" cy="193" r="42" fill="#0b2e2b" stroke="#e8fff3" stroke-width="2"/>
-          <g transform="translate(246 193) scale(0.8) translate(-30 -30)">
-            <path d="M30 18 L20 38 H40 Z" fill="none" stroke="#6ee7a8" stroke-width="2.5" stroke-linejoin="round"/>
-            <circle cx="30" cy="18" r="4" fill="#a7f3d0"/>
-            <circle cx="20" cy="38" r="4" fill="#a7f3d0"/>
-            <circle cx="40" cy="38" r="4" fill="#a7f3d0"/>
-          </g>
+            <div class="pool-row"><span>Worker pool</span><strong>12 / 12 active</strong></div>
+          </div>
+        </div>
+        <div class="toast">✓ Job completed successfully</div>
+      </div>
+    </section>
+
+    <!-- Capabilities -->
+    <section class="section" id="capabilities">
+      <div class="section-head">
+        <span class="eyebrow">ONE WORKSPACE, FULL VISIBILITY</span>
+        <h2>Everything you need to run jobs.</h2>
+        <p>From submission to final output, Telos gives you a practical view of what is happening across your worker pool.</p>
+      </div>
+      <div class="cards">
+        <article class="card-feature">
+          <span class="ficon">↓</span>
+          <h3>Simple job submission</h3>
+          <p>Send computational tasks to the platform and let them run asynchronously while you focus on the work.</p>
+        </article>
+        <article class="card-feature">
+          <span class="ficon">⑂</span>
+          <h3>Distributed execution</h3>
+          <p>Jobs are assigned across available worker nodes, helping workloads run concurrently instead of waiting in one place.</p>
+        </article>
+        <article class="card-feature">
+          <span class="ficon">◎</span>
+          <h3>Live job visibility</h3>
+          <p>Track queued, running and completed jobs, inspect execution logs, and access results when tasks finish.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section alt" id="how-it-works">
+      <div class="section-head">
+        <span class="eyebrow">A STRAIGHTFORWARD WORKFLOW</span>
+        <h2>From task to result in three steps.</h2>
+        <p>Telos coordinates the execution process so you can focus on the computational task itself.</p>
+      </div>
+      <div class="cards steps-row">
+        <article class="card-step">
+          <span class="step-label">01 / SUBMIT</span>
+          <h3>Send your job</h3>
+          <p>Choose the task and submit it to the job queue with the required input.</p>
+        </article>
+        <article class="card-step">
+          <span class="step-label">02 / DISTRIBUTE</span>
+          <h3>Workers process it</h3>
+          <p>The scheduler assigns queued work to available worker nodes for execution.</p>
+        </article>
+        <article class="card-step">
+          <span class="step-label">03 / COLLECT</span>
+          <h3>Review the result</h3>
+          <p>Follow progress, inspect logs and retrieve the output after the job completes.</p>
+        </article>
+      </div>
+      <ul class="checks">
+        <li>Asynchronous processing</li>
+        <li>Centralized monitoring</li>
+        <li>Worker-based execution</li>
+      </ul>
+    </section>
+
+    <!-- Call to action -->
+    <section class="cta">
+      <div>
+        <h2>Make your next job the first.</h2>
+        <p>Start with a task and see how distributed processing works with Telos.</p>
+      </div>
+      <a href="/user/signup" class="h-btn small">Get started →</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="foot">
+      <a href="/" class="foot-brand">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" stroke="#14a39a" stroke-width="3"/>
+          <path d="M30 18 L20 38 H40 Z" stroke="#14a39a" stroke-width="3" stroke-linejoin="round"/>
         </svg>
-      </div>
-    </section>
-
-    <section class="features">
-      <article class="feature">
-        <h3>Asynchronous processing</h3>
-        <p>Submit a job and carry on. Workers pick it up from the queue in the background.</p>
-      </article>
-      <article class="feature">
-        <h3>Smart scheduling</h3>
-        <p>Jobs are shared across workers using Round Robin, with higher-priority queues served first.</p>
-      </article>
-      <article class="feature">
-        <h3>Track every job</h3>
-        <p>Follow progress live and download the results as soon as a job completes.</p>
-      </article>
-    </section>
+        <span>Telos</span>
+      </a>
+      <span class="foot-tag">Distributed job processing, made clear.</span>
+      <nav class="foot-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#platform">Back to top ↑</a>
+      </nav>
+    </footer>
 
   </div>
 </body>
