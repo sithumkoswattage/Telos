@@ -5,7 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
+	"telos/internal/db"
+
+	"github.com/joho/godotenv"
 )
 
 type PageData struct {
@@ -815,6 +819,18 @@ func adminLogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// 1. Load environment variables from .env
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found; falling back to system environment variables")
+	}
+
+	// 2. Connect to PostgreSQL
+	database, err := db.Connect()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer database.Close()
+
 	// Public pages
 	http.HandleFunc("/{$}", loginPage("home.html"))
 	http.Handle("/login", http.RedirectHandler("/choose-role", http.StatusFound))
@@ -875,6 +891,11 @@ func main() {
 	// CSS and images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	log.Println("Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Server running on http://localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
