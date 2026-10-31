@@ -37,7 +37,7 @@
     <tbody>
       {{range .Data.Jobs}}
       <tr>
-        <td>{{.ID}}</td>
+        <td><a href="/admin/jobs/details?id={{.ID}}">{{.ID}}</a></td>
         <td>{{.Name}}</td>
         <td>{{.Queue}}</td>
         <td><span class="pill {{.PriorityClass}}">{{.Priority}}</span></td>

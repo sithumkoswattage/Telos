@@ -1,6 +1,6 @@
 {{define "sidebar"}}
 <aside class="sidebar">
-  <div class="brand">{{template "logo"}}<span>Telos</span></div>
+  <a href="/choose-role" class="brand">{{template "logo"}}<span>Telos</span></a>
   <nav>
     <a href="/admin/dashboard"  class="{{if eq .Section "dashboard"}}active{{end}}">Dashboard</a>
     <a href="/admin/jobs"       class="{{if eq .Section "jobs"}}active{{end}}">Jobs</a>
