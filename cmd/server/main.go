@@ -899,6 +899,11 @@ func main() {
 	}
 	defer database.Close()
 
+	// 3. Create tables if they don't exist yet
+	if err := db.Migrate(database); err != nil {
+		log.Fatalf("Failed to apply database schema: %v", err)
+	}
+
 	// Public pages (standalone, no sidebar)
 	http.HandleFunc("/{$}", loginPage("home.html"))
 	http.HandleFunc("/choose-role", loginPage("choose-role.html"))
