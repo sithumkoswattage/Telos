@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"telos/internal/api"
 	"telos/internal/db"
 
 	"github.com/joho/godotenv"
@@ -898,6 +899,10 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer database.Close()
+
+	// API routes
+	jobsHandler := &api.JobsHandler{DB: database}
+	http.HandleFunc("POST /api/jobs", jobsHandler.Submit)
 
 	// Public pages (standalone, no sidebar)
 	http.HandleFunc("/{$}", loginPage("home.html"))
