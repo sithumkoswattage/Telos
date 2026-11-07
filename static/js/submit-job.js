@@ -213,13 +213,57 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-  // Submit form (frontend preview only)
-  form.addEventListener("submit", (event) => {
+  // Authentication is not implemented yet, so the server does not expose a
+  // legitimate user UUID to this page.
+  function getAuthenticatedUserID() {
+    return null;
+  }
+
+  async function submitJob(userID, jobData) {
+    const response = await fetch("/api/jobs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user_id: userID,
+        type: jobData.type,
+        priority: jobData.priority,
+        input_method: jobData.inputMethod,
+        content: jobData.input,
+        ...(jobData.fileName ? { file_name: jobData.fileName } : {})
+      })
+    });
+
+    let responseData = {};
+    try {
+      responseData = await response.json();
+    } catch (error) {
+      if (!response.ok) {
+        throw new Error("The server returned an invalid error response.");
+      }
+    }
+
+    if (!response.ok) {
+      throw new Error(responseData.error || "Unable to submit the job.");
+    }
+
+    return responseData;
+  }
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     submitMessage.textContent = "";
 
     if (!validateForm()) return;
+
+    const userID = getAuthenticatedUserID();
+    if (!userID) {
+      submitMessage.textContent =
+        "Job submission is unavailable until you are signed in.";
+      return;
+    }
 
     const method = getInputMethod();
 
@@ -233,16 +277,21 @@ document.addEventListener("DOMContentLoaded", () => {
       fileName: method === "file" ? uploadedFileName : null
     };
 
-    console.log("Job submission preview:", jobData);
-
     submitButton.disabled = true;
-    submitButton.textContent = "Ready to submit...";
+    submitButton.textContent = "Submitting...";
 
-    submitMessage.textContent =
-      "Your job details are ready. Backend submission is not connected yet.";
-
-    submitButton.disabled = false;
-    submitButton.textContent = "Submit Job →";
+    try {
+      const response = await submitJob(userID, jobData);
+      submitMessage.textContent =
+        `Job ${response.id} is ${response.status}.`;
+      errorMessage.textContent = "";
+    } catch (error) {
+      errorMessage.textContent = error.message;
+      submitMessage.textContent = "";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Job →";
+    }
   });
 
 });

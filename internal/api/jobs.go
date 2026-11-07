@@ -29,7 +29,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 
 // Submit handles POST /api/jobs.
 //
-// Request:  {"user_id":"<uuid>","name":"...","priority":"high|normal|low","content":"..."}
+// Request:  {"user_id":"<uuid>","type":"text_processing","priority":"high|normal|low","input_method":"text|file","content":"...","file_name":"..."}
 // Response: 201 {"id":"<uuid>","status":"queued"}
 func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, maxSubmitBytes)
@@ -44,10 +44,6 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
-	if strings.TrimSpace(req.Name) == "" {
-		writeError(w, http.StatusBadRequest, "name is required")
-		return
-	}
 	if strings.TrimSpace(req.Content) == "" {
 		writeError(w, http.StatusBadRequest, "content is required")
 		return
@@ -60,6 +56,14 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	if req.Type != "text_processing" && req.Type != "text-processing" {
+		writeError(w, http.StatusBadRequest, "type must be text_processing")
+		return
+	}
+	if req.InputMethod != "text" && req.InputMethod != "file" {
+		writeError(w, http.StatusBadRequest, "input_method must be text or file")
+		return
+	}
 
 	resp, err := job.Create(r.Context(), h.DB, req)
 	if err != nil {
@@ -68,6 +72,10 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, err.Error())
 		case errors.Is(err, job.ErrUnknownUser):
 			writeError(w, http.StatusBadRequest, "unknown user_id")
+		case errors.Is(err, job.ErrInvalidJobType),
+			errors.Is(err, job.ErrInvalidInputMethod),
+			errors.Is(err, job.ErrEmptyContent):
+			writeError(w, http.StatusBadRequest, err.Error())
 		default:
 			log.Printf("create job: %v", err)
 			writeError(w, http.StatusInternalServerError, "failed to create job")
