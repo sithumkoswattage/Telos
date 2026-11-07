@@ -17,3 +17,16 @@ A Job Management Software to distribute computational heavy work between nodes u
 5. Open http://localhost:8080
 
 Run the tests with `go test ./...`.
+
+## Running with Docker
+
+1. Install Docker Desktop.
+2. Copy `.env.example` to `.env` and set `DB_PASSWORD`.
+3. Start everything:
+   ```
+   docker compose up --build
+   ```
+4. Open http://localhost:8080
+
+Stop with `Ctrl+C`; `docker compose down -v` also deletes the database data.
+If port 8080 is taken, change `PORT` in `.env`.
