@@ -48,7 +48,15 @@ If port 8080 is taken, change `PORT` in `.env`.
 `user_id` comes from the request for now; it will come from the login token once auth exists. Until then, create a dev user and use its id:
 
 ```
-psql -U postgres -d telos -c "INSERT INTO users (email, password_hash) VALUES ('dev@telos.local', 'dev-only') RETURNING id;"
+"INSERT INTO users (email, password_hash) VALUES ('dev@telos.local','dev-only') RETURNING id;" | docker compose exec -T db psql -U postgres -d telos
 ```
 
 If your local database was created before this change, reset it with `docker compose down -v` (or drop and recreate the `telos` database).
+
+## Checking on jobs
+
+- `GET /api/jobs?user_id=<uuid>` lists that user's jobs, newest first (at most 100): `id`, `name`, `type`, `queue`, `priority`, `status`, `created_at`.
+- `GET /api/jobs/{id}?user_id=<uuid>` returns one job: the fields above plus `updated_at`, `started_at`, `completed_at`, `error` and `result` (the result is only present once the job has completed).
+- `status` is one of `queued`, `running`, `completed`, `failed`, `cancelled`.
+- `404` if the job does not exist or belongs to another user; `400` if `user_id` is missing or an id is not a valid UUID.
+- As with submitting, `user_id` comes from the query string for now and will come from the login token later.
