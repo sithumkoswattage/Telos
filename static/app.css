@@ -743,8 +743,6 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
   .results-grid { grid-template-columns: 1fr; }
 }
 
-.btn.ghost { background: white; border: 1px solid #cfe5dc; }
-
 /* ================= Worker dashboard ================= */
 .worker-stats { margin: 18px 0 16px; }
 .task-line {
@@ -802,3 +800,284 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
   text-decoration: none;
 }
 .sidebar a.brand:hover { opacity: 0.85; }
+
+
+/* ==================================
+   TEL-34 - Submit Job
+================================== */
+
+.submit-job-page {
+  width: 100%;
+  max-width: 900px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.submit-job-heading {
+  margin-bottom: 28px;
+}
+
+.submit-job-heading h1 {
+  margin-bottom: 6px;
+}
+
+.submit-job-heading p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.submit-job-page > .card.settings-card {
+  width: 100%;
+  max-width: none;
+}
+
+.submit-job-page .card.settings-card label {
+  display: block;
+  margin: 0 0 9px;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.submit-job-page .card.settings-card select,
+.submit-job-page .card.settings-card textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  color: var(--text);
+  font: inherit;
+}
+
+.submit-job-page .card.settings-card select:focus,
+.submit-job-page .card.settings-card textarea:focus {
+  outline: 2px solid rgba(15, 118, 110, 0.18);
+  border-color: var(--teal);
+}
+
+.submit-job-page .card.settings-card label.tj-priority-option,
+.submit-job-page .card.settings-card label.tj-method-option,
+.submit-job-page .card.settings-card label.tj-upload-area {
+  display: flex;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.tj-field {
+  margin: 0 0 26px;
+}
+
+.tj-field small {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+}
+
+.tj-priorities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tj-priority-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.tj-priority-option.selected {
+  border-color: var(--teal);
+  background: #edf9f5;
+  color: var(--teal);
+}
+
+.tj-input-methods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tj-method-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tj-method-option.selected {
+  border-color: var(--teal);
+  background: #edf9f5;
+}
+
+.tj-method-option strong {
+  display: block;
+}
+
+.tj-input-section {
+  margin: 0 0 26px;
+}
+
+.tj-input-section textarea {
+  display: block;
+  min-height: 180px;
+  resize: vertical;
+}
+
+.tj-upload-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 170px;
+  padding: 25px;
+  border: 2px dashed #b8d9cc;
+  border-radius: 12px;
+  background: #f8fcfa;
+  text-align: center;
+  cursor: pointer;
+}
+
+.tj-upload-area:hover,
+.tj-upload-area.dragging {
+  border-color: var(--teal);
+  background: #edf9f5;
+}
+
+.tj-upload-area:focus-within {
+  outline: 2px solid rgba(15, 118, 110, 0.18);
+  outline-offset: 2px;
+}
+
+.tj-upload-icon {
+  color: var(--teal);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.tj-upload-area small {
+  color: var(--muted);
+}
+
+.tj-upload-area input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tj-file-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.tj-remove-file {
+  padding: 3px 8px;
+  border: 1px solid #b8d9cc;
+  border-radius: 6px;
+  background: white;
+  color: var(--teal);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tj-remove-file:hover {
+  border-color: var(--teal);
+  background: #edf9f5;
+}
+
+.tj-input-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 7px;
+  color: var(--muted);
+}
+
+.tj-error,
+.tj-success {
+  margin: 0 0 18px;
+  font-size: 14px;
+}
+
+.tj-error {
+  color: #c0392b;
+}
+
+.tj-success {
+  margin-top: 18px;
+  margin-bottom: 0;
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.tj-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.tj-actions > span {
+  display: none;
+}
+
+.submit-job-page .tj-actions button {
+  margin-top: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.submit-job-page .tj-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .submit-job-page > .card.settings-card {
+    padding: 18px;
+  }
+
+  .tj-input-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .tj-priorities {
+    gap: 8px;
+  }
+
+  .tj-priority-option {
+    flex: 1 1 90px;
+    justify-content: center;
+  }
+
+  .tj-actions button {
+    width: 100%;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
