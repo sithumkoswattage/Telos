@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"telos/internal/api"
 	"telos/internal/db"
 
 	"github.com/joho/godotenv"
