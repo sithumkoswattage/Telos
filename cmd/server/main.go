@@ -908,6 +908,8 @@ func main() {
 	// API routes
 	jobsHandler := &api.JobsHandler{DB: database}
 	http.HandleFunc("POST /api/jobs", jobsHandler.Submit)
+	http.HandleFunc("GET /api/jobs", jobsHandler.List)
+	http.HandleFunc("GET /api/jobs/{id}", jobsHandler.Get)
 
 	// Public pages (standalone, no sidebar)
 	http.HandleFunc("/{$}", loginPage("home.html"))

@@ -79,3 +79,60 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(resp)
 }
+
+// writeJSON sends v as JSON with the given status.
+func writeJSON(w http.ResponseWriter, status int, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(v)
+}
+
+// writeJobError turns the errors from the job package into HTTP replies.
+func writeJobError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, job.ErrInvalidUserID), errors.Is(err, job.ErrInvalidJobID):
+		writeError(w, http.StatusBadRequest, err.Error())
+	case errors.Is(err, job.ErrNotFound):
+		writeError(w, http.StatusNotFound, "job not found")
+	default:
+		log.Printf("jobs: %v", err)
+		writeError(w, http.StatusInternalServerError, "internal error")
+	}
+}
+
+// List handles GET /api/jobs?user_id=<uuid>
+//
+// Response: 200 with a JSON array of the user's jobs, newest first.
+func (h *JobsHandler) List(w http.ResponseWriter, r *http.Request) {
+	userID := r.URL.Query().Get("user_id")
+	if userID == "" {
+		writeError(w, http.StatusBadRequest, "user_id is required")
+		return
+	}
+
+	jobs, err := job.List(r.Context(), h.DB, userID)
+	if err != nil {
+		writeJobError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, jobs)
+}
+
+// Get handles GET /api/jobs/{id}?user_id=<uuid>
+//
+// Response: 200 with one job (status, timestamps, and result once completed),
+// or 404 if the job does not exist or belongs to another user.
+func (h *JobsHandler) Get(w http.ResponseWriter, r *http.Request) {
+	userID := r.URL.Query().Get("user_id")
+	if userID == "" {
+		writeError(w, http.StatusBadRequest, "user_id is required")
+		return
+	}
+
+	detail, err := job.Get(r.Context(), h.DB, r.PathValue("id"), userID)
+	if err != nil {
+		writeJobError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, detail)
+}
