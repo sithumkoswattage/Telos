@@ -1,0 +1,3 @@
+# Let Git normalise line endings so Windows (CRLF) and Linux/Docker (LF) checkouts do not
+# show every file as modified.
+* text=auto
