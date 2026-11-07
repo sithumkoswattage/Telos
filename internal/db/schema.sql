@@ -32,7 +32,9 @@ CREATE TABLE IF NOT EXISTS workers (
 CREATE TABLE IF NOT EXISTS jobs (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id      UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    type         TEXT        NOT NULL CHECK (type IN ('matrix_multiply')),
+    name         TEXT        NOT NULL DEFAULT '',
+    type         TEXT        NOT NULL CHECK (type IN ('text_processing', 'matrix_multiply')),
+    queue        TEXT        NOT NULL DEFAULT 'text-processing',
     priority     TEXT        NOT NULL DEFAULT 'normal'
                  CHECK (priority IN ('high', 'normal', 'low')),
     status       TEXT        NOT NULL DEFAULT 'queued'
@@ -45,6 +47,13 @@ CREATE TABLE IF NOT EXISTS jobs (
     started_at   TIMESTAMPTZ,
     completed_at TIMESTAMPTZ
 );
+
+-- Upgrade databases that were created before name/queue/text_processing
+-- existed (CREATE TABLE IF NOT EXISTS above does not alter an existing table).
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS name  TEXT NOT NULL DEFAULT '';
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS queue TEXT NOT NULL DEFAULT 'text-processing';
+ALTER TABLE jobs DROP CONSTRAINT IF EXISTS jobs_type_check;
+ALTER TABLE jobs ADD CONSTRAINT jobs_type_check CHECK (type IN ('text_processing', 'matrix_multiply'));
 
 CREATE INDEX IF NOT EXISTS jobs_user_idx   ON jobs (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS jobs_queued_idx ON jobs (priority, created_at) WHERE status = 'queued';

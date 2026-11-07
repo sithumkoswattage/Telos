@@ -88,12 +88,15 @@ func (s *JobStatus) Scan(src any) error {
 type JobType string
 
 const (
+	// JobTypeTextProcessing is the MVP job type: the input is
+	// {"content": "..."} and the coordinator splits the text into chunks.
+	JobTypeTextProcessing JobType = "text_processing"
 	JobTypeMatrixMultiply JobType = "matrix_multiply"
 )
 
 func (t JobType) Valid() bool {
 	switch t {
-	case JobTypeMatrixMultiply:
+	case JobTypeTextProcessing, JobTypeMatrixMultiply:
 		return true
 	}
 	return false

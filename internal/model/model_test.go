@@ -295,3 +295,12 @@ func must(t *testing.T, err error) {
 		t.Fatal(err)
 	}
 }
+
+func TestTextProcessingJobTypeIsValid(t *testing.T) {
+	if !JobTypeTextProcessing.Valid() {
+		t.Error("text_processing should be a valid job type")
+	}
+	if _, err := NewJob("j", "u", JobTypeTextProcessing, PriorityNormal, json.RawMessage(`{"content":"hi"}`), t0); err != nil {
+		t.Errorf("NewJob(text_processing) = %v", err)
+	}
+}
