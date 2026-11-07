@@ -1,54 +1,125 @@
+
 {{define "content"}}
-<h1>Submit New Job</h1>
+<div class="submit-job-page">
 
-<div class="steps">
-  {{range .Data.Steps}}
-  {{end}}
-</div>
-
-{{if eq .Data.Step 1}}
-<div class="card settings-card">
-  <label for="job-name">Job name</label>
-  <input type="text" id="job-name" value="Image Processing Job">
-
-  <label for="queue">Queue</label>
-  <select id="queue">
-    {{range .Data.Queues}}<option {{if eq . "image-processing"}}selected{{end}}>{{.}}</option>{{end}}
-  </select>
-
-  <label>Priority</label>
-  <div class="radios">
-    <label class="radio"><input type="radio" name="priority" value="high"> High</label>
-    <label class="radio"><input type="radio" name="priority" value="normal" checked> Normal</label>
-    <label class="radio"><input type="radio" name="priority" value="low"> Low</label>
+  <div class="submit-job-heading">
+    <h1>Submit New Job</h1>
+    <p>Choose a processing type, set the priority, and provide your input.</p>
   </div>
 
-  <label for="file">Input file</label>
-  <div class="dropzone">
-    <strong>Drag &amp; drop files here, or click to upload</strong>
-    <small>Supported formats: .zip, .tar, .png, .jpg (max 500 MB)</small>
-    <input type="file" id="file" accept=".zip,.tar,.png,.jpg">
-  </div>
+  <form id="submit-job-form" class="card settings-card" novalidate>
 
-  <a href="/user/submit-job?step=2" class="btn">Next →</a>
+    <!-- JOB TYPE -->
+    <div class="tj-field">
+      <label for="job-type">Choose Your Job</label>
+
+      <select id="job-type" name="job-type" required>
+        <option value="" disabled selected>Select a processing type</option>
+        <option value="text-processing">Text Processing</option>
+      </select>
+
+      <small>Select the type of processing you want Telos to perform.</small>
+    </div>
+
+    <!-- PRIORITY -->
+    <div class="tj-field">
+      <label>Priority</label>
+
+      <div class="tj-priorities">
+        <label class="tj-priority-option">
+          <input type="radio" name="priority" value="high">
+          <span>High</span>
+        </label>
+
+        <label class="tj-priority-option selected">
+          <input type="radio" name="priority" value="normal" checked>
+          <span>Normal</span>
+        </label>
+
+        <label class="tj-priority-option">
+          <input type="radio" name="priority" value="low">
+          <span>Low</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- INPUT METHOD -->
+    <div class="tj-field">
+      <label>Input Method</label>
+
+      <div class="tj-input-methods">
+
+        <label class="tj-method-option selected">
+          <input type="radio" name="input-method" value="text" checked>
+          <span>
+            <strong>Text input</strong>
+          </span>
+        </label>
+
+        <label class="tj-method-option">
+          <input type="radio" name="input-method" value="file">
+          <span>
+            <strong>File upload</strong>
+          </span>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- TEXT INPUT -->
+    <div id="text-input-section" class="tj-input-section">
+      <label for="job-text">Text to process</label>
+
+      <textarea
+        id="job-text"
+        name="job-text"
+        rows="7"
+        placeholder="Enter the text you want to process..."
+      ></textarea>
+
+    </div>
+
+    <!-- FILE UPLOAD -->
+    <div id="file-input-section" class="tj-input-section" hidden>
+      <label for="job-file">Upload your file here</label>
+
+      <label class="tj-upload-area" for="job-file" id="tj-drop-area">
+        <span class="tj-upload-icon">↑</span>
+        <strong>Drag &amp; drop a text file here, or click to upload</strong>
+        <small>Supported format: .txt</small>
+
+        <input
+          type="file"
+          id="job-file"
+          name="job-file"
+          accept=".txt,text/plain"
+        >
+      </label>
+
+      <div class="tj-file-status">
+        <span id="selected-file-name">No file selected</span>
+        <button type="button" id="remove-selected-file" class="tj-remove-file" hidden>
+          × Remove
+        </button>
+      </div>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <p id="tj-error" class="tj-error" role="alert"></p>
+
+    <!-- SUBMIT -->
+    <div class="tj-actions">
+      <span></span>
+
+      <button type="submit" class="btn" id="submit-job-button">
+        Submit Job →
+      </button>
+    </div>
+
+    <p id="tj-submit-message" class="tj-success" role="status"></p>
+
+  </form>
 </div>
 
-{{else if eq .Data.Step 2}}
-<div class="card settings-card">
-  <p class="empty-note">Input settings for the job will go here.</p>
-  <div class="wiz-actions">
-    <a href="/user/submit-job?step=1" class="btn ghost">← Back</a>
-    <a href="/user/submit-job?step=3" class="btn">Next →</a>
-  </div>
-</div>
-
-{{else}}
-<div class="card settings-card">
-  <p class="empty-note">A summary of the job will go here for review before submitting.</p>
-  <div class="wiz-actions">
-    <a href="/user/submit-job?step=2" class="btn ghost">← Back</a>
-    <a href="/user/job-details" class="btn">Submit Job</a>
-  </div>
-</div>
-{{end}}
+<script src="/static/js/submit-job.js" defer></script>
 {{end}}

@@ -7,34 +7,26 @@
   <a href="/user/submit-job" class="btn">+ Submit Job Request</a>
 </div>
 
-<div class="stats">
-  <div class="stat"><span>Total Jobs</span><strong>{{.Data.Total}}</strong></div>
-  <div class="stat completed"><span>Completed</span><strong>{{.Data.Completed}}</strong></div>
-  <div class="stat processing"><span>Processing</span><strong>{{.Data.Processing}}</strong></div>
-  <div class="stat failed"><span>Failed</span><strong>{{.Data.Failed}}</strong></div>
+<div class="stats" id="job-stats" aria-live="polite">
+  <div class="stat"><span>Total Jobs</span><strong id="total-jobs">—</strong></div>
+  <div class="stat queued"><span>Queued</span><strong id="queued-jobs">—</strong></div>
+  <div class="stat processing"><span>Processing</span><strong id="processing-jobs">—</strong></div>
+  <div class="stat completed"><span>Completed</span><strong id="completed-jobs">—</strong></div>
+  <div class="stat failed"><span>Failed</span><strong id="failed-jobs">—</strong></div>
 </div>
 
 <div class="panel">
   <h3>Recent Jobs</h3>
-  <table>
+  <p id="jobs-message" class="empty-note" role="status">Loading jobs...</p>
+  <table id="jobs-table" hidden>
     <thead>
       <tr>
         <th>ID</th><th>Name</th><th>Status</th>
-        <th>Submitted</th><th>Actions</th><th>Percentage</th>
+        <th>Priority</th><th>Submitted</th><th>Actions</th>
       </tr>
     </thead>
-    <tbody>
-      {{range .Data.Jobs}}
-      <tr>
-        <td>{{.ID}}</td>
-        <td>{{.Name}}</td>
-        <td><span class="badge {{.Class}}">{{.Status}}</span></td>
-        <td>{{.Submitted}}</td>
-        <td><a href="{{.ActionURL}}">{{.Action}}</a></td>
-        <td>{{.Percent}}%</td>
-      </tr>
-      {{end}}
-    </tbody>
+    <tbody id="jobs-body"></tbody>
   </table>
 </div>
+<script src="/static/js/dashboard.js?v=1"></script>
 {{end}}

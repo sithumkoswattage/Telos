@@ -17,7 +17,17 @@ import (
 const maxSubmitBytes = 5 << 20 // 5 MiB
 
 type JobsHandler struct {
-	DB *sql.DB
+	DB                *sql.DB
+	DevelopmentUserID string
+}
+
+func (h *JobsHandler) userID(w http.ResponseWriter) (string, bool) {
+	if h.DevelopmentUserID == "" {
+		writeError(w, http.StatusServiceUnavailable,
+			"job ownership is unavailable until authentication is configured")
+		return "", false
+	}
+	return h.DevelopmentUserID, true
 }
 
 // writeError sends {"error": msg} with the given status.
@@ -29,7 +39,7 @@ func writeError(w http.ResponseWriter, status int, msg string) {
 
 // Submit handles POST /api/jobs.
 //
-// Request:  {"user_id":"<uuid>","name":"...","priority":"high|normal|low","content":"..."}
+// Request:  {"type":"text_processing","priority":"high|normal|low","input_method":"text|file","content":"...","file_name":"..."}
 // Response: 201 {"id":"<uuid>","status":"queued"}
 func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, maxSubmitBytes)
@@ -44,23 +54,28 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid JSON")
 		return
 	}
-	if strings.TrimSpace(req.Name) == "" {
-		writeError(w, http.StatusBadRequest, "name is required")
-		return
-	}
 	if strings.TrimSpace(req.Content) == "" {
 		writeError(w, http.StatusBadRequest, "content is required")
-		return
-	}
-	if req.UserID == "" {
-		writeError(w, http.StatusBadRequest, "user_id is required")
 		return
 	}
 	if _, err := model.ParsePriority(req.Priority); err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	if req.Type != "text_processing" && req.Type != "text-processing" {
+		writeError(w, http.StatusBadRequest, "type must be text_processing")
+		return
+	}
+	if req.InputMethod != "text" && req.InputMethod != "file" {
+		writeError(w, http.StatusBadRequest, "input_method must be text or file")
+		return
+	}
 
+	userID, ok := h.userID(w)
+	if !ok {
+		return
+	}
+	req.UserID = userID
 	resp, err := job.Create(r.Context(), h.DB, req)
 	if err != nil {
 		switch {
@@ -68,6 +83,10 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, err.Error())
 		case errors.Is(err, job.ErrUnknownUser):
 			writeError(w, http.StatusBadRequest, "unknown user_id")
+		case errors.Is(err, job.ErrInvalidJobType),
+			errors.Is(err, job.ErrInvalidInputMethod),
+			errors.Is(err, job.ErrEmptyContent):
+			writeError(w, http.StatusBadRequest, err.Error())
 		default:
 			log.Printf("create job: %v", err)
 			writeError(w, http.StatusInternalServerError, "failed to create job")
@@ -100,13 +119,12 @@ func writeJobError(w http.ResponseWriter, err error) {
 	}
 }
 
-// List handles GET /api/jobs?user_id=<uuid>
+// List handles GET /api/jobs.
 //
 // Response: 200 with a JSON array of the user's jobs, newest first.
 func (h *JobsHandler) List(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		writeError(w, http.StatusBadRequest, "user_id is required")
+	userID, ok := h.userID(w)
+	if !ok {
 		return
 	}
 
@@ -118,14 +136,13 @@ func (h *JobsHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, jobs)
 }
 
-// Get handles GET /api/jobs/{id}?user_id=<uuid>
+// Get handles GET /api/jobs/{id}.
 //
 // Response: 200 with one job (status, timestamps, and result once completed),
 // or 404 if the job does not exist or belongs to another user.
 func (h *JobsHandler) Get(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		writeError(w, http.StatusBadRequest, "user_id is required")
+	userID, ok := h.userID(w)
+	if !ok {
 		return
 	}
 
