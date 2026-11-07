@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"log"
@@ -407,49 +408,12 @@ func authPage(signup bool) http.HandlerFunc {
 
 // ======================= User pages =======================
 
-// userDashboard shows sample data for now; the database will replace it later
 func userDashboard(w http.ResponseWriter, r *http.Request) {
-	data := DashboardData{
-		Total: 28, Completed: 19, Processing: 6, Failed: 3,
-		Jobs: []Job{
-			{"#J-10432", "Generate thumbnails", "Processing", "processing", "Oct 16, 14:32", "View", "/user/job-details", 80},
-			{"#J-10431", "Analyze dataset", "Completed", "completed", "Oct 16, 13:18", "Results", "/user/results", 100},
-			{"#J-10430", "Encode video", "Completed", "completed", "Oct 16, 10:45", "Results", "/user/results", 100},
-			{"#J-10429", "Send email", "Failed", "failed", "Oct 16, 09:22", "View", "/user/job-details", 0},
-			{"#J-10428", "Process image", "Completed", "completed", "Oct 16, 08:17", "Results", "/user/results", 100},
-		},
-	}
-	render(w, r, "user", "user/dashboard.html", PageData{Title: "Dashboard", Data: data})
+	render(w, r, "user", "user/dashboard.html", PageData{Title: "Dashboard"})
 }
 
-// userJobDetails shows sample data for now; the database will replace it later
 func userJobDetails(w http.ResponseWriter, r *http.Request) {
-	tab := r.URL.Query().Get("tab")
-	if tab != "output" {
-		tab = "logs"
-	}
-	data := JobDetailsData{
-		ID: "#J-10432", Name: "Generate thumbnails",
-		Status: "Processing", StatusClass: "processing",
-		Submitted: "Oct 16, 14:32",
-		Percent:   60,
-		Queue:     "image-processing", Worker: "worker-3", Elapsed: "3m 24s",
-		Steps: []JobStep{
-			{1, "Submitted", true},
-			{2, "Queued", true},
-			{3, "Processing", true},
-			{4, "Completed", false},
-		},
-		Logs: []JobLog{
-			{"14:32", "Job started"},
-			{"14:36", "Processing chunk 1/10"},
-			{"14:38", "Processing chunk 2/10"},
-			{"14:40", "Processing chunk 3/10"},
-		},
-		Tab:    tab,
-		TabURL: "/user/job-details?tab=",
-	}
-	render(w, r, "user", "user/job-details.html", PageData{Title: "Job Details", Data: data})
+	render(w, r, "user", "user/job-details.html", PageData{Title: "Job Details"})
 }
 
 // userSubmitJob shows the 3-step form: /user/submit-job?step=1 (or 2, 3)
@@ -476,24 +440,8 @@ func userSubmitJob(w http.ResponseWriter, r *http.Request) {
 	render(w, r, "user", "user/submit-job.html", PageData{Title: "Submit New Job", Data: data})
 }
 
-// userResults shows sample data for now; the database will replace it later
 func userResults(w http.ResponseWriter, r *http.Request) {
-	data := JobResultsData{
-		ID: "#J-10432", Name: "Generate thumbnails",
-		Completed: "Oct 16, 14:42",
-		Status:    "Completed", StatusClass: "completed",
-		Files: []ResultFile{
-			{"thumbnails.zip"},
-			{"preview.jpg"},
-		},
-		Summary: []SummaryRow{
-			{"Queue", "image-processing"},
-			{"Worker", "worker-3"},
-			{"Duration", "10m 12s"},
-			{"Chunks processed", "10 / 10"},
-		},
-	}
-	render(w, r, "user", "user/results.html", PageData{Title: "Job Results", Data: data})
+	render(w, r, "user", "user/results.html", PageData{Title: "Job Results"})
 }
 
 // ======================= Admin pages =======================
@@ -906,7 +854,26 @@ func main() {
 	}
 
 	// API routes
-	jobsHandler := &api.JobsHandler{DB: database}
+	var developmentUserID string
+	if db.DevelopmentIdentityEnabled(os.Getenv("TELOS_ENV")) {
+		developmentUserID, err = db.SeedDevelopmentUser(
+			context.Background(),
+			database,
+			os.Getenv("TELOS_DEV_USER_EMAIL"),
+			os.Getenv("TELOS_DEV_USER_NAME"),
+			os.Getenv("TELOS_DEV_USER_PASSWORD"),
+		)
+		if err != nil {
+			log.Fatalf("Failed to seed development user: %v", err)
+		}
+		log.Println("Development identity enabled")
+	} else {
+		log.Println("Development identity disabled; production requires real authentication")
+	}
+
+	jobsHandler := &api.JobsHandler{
+		DB: database, DevelopmentUserID: developmentUserID,
+	}
 	http.HandleFunc("POST /api/jobs", jobsHandler.Submit)
 	http.HandleFunc("GET /api/jobs", jobsHandler.List)
 	http.HandleFunc("GET /api/jobs/{id}", jobsHandler.Get)

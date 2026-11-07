@@ -213,20 +213,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-  // Authentication is not implemented yet, so the server does not expose a
-  // legitimate user UUID to this page.
-  function getAuthenticatedUserID() {
-    return null;
-  }
-
-  async function submitJob(userID, jobData) {
+  async function submitJob(jobData) {
     const response = await fetch("/api/jobs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        user_id: userID,
         type: jobData.type,
         priority: jobData.priority,
         input_method: jobData.inputMethod,
@@ -258,13 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!validateForm()) return;
 
-    const userID = getAuthenticatedUserID();
-    if (!userID) {
-      submitMessage.textContent =
-        "Job submission is unavailable until you are signed in.";
-      return;
-    }
-
     const method = getInputMethod();
 
     const jobData = {
@@ -281,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     submitButton.textContent = "Submitting...";
 
     try {
-      const response = await submitJob(userID, jobData);
+      const response = await submitJob(jobData);
       submitMessage.textContent =
         `Job ${response.id} is ${response.status}.`;
       errorMessage.textContent = "";

@@ -131,7 +131,7 @@ body {
 /* ================= Stat cards ================= */
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -145,6 +145,7 @@ body {
 .stat strong { display: block; margin-top: 4px; font-size: 26px; font-weight: 600; }
 .stat.completed  { background: #a7f5cc; border-color: #a7f5cc; }
 .stat.processing { background: #fdefc3; border-color: #fdefc3; }
+.stat.queued     { background: #fdefc3; border-color: #fdefc3; }
 .stat.failed     { background: #fbb6b6; border-color: #fbb6b6; }
 
 .trend { display: block; margin-top: 6px; font-size: 11px; font-weight: 600; }
