@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"telos/internal/api"
 	"telos/internal/db"
+	"telos/internal/job"
 
 	"github.com/joho/godotenv"
 )
@@ -109,23 +112,17 @@ type AdminStat struct {
 	Class      string // card colour: "", completed, processing or failed
 }
 
-type QueueShare struct {
-	Name    string
-	Percent int
-	Class   string // c1 to c6 (legend colour)
-}
-
 type RecentJob struct {
-	ID     string
-	Name   string
-	Status string
+	ID          string // full UUID, used in the link
+	ShortID     string // first 8 characters, shown on screen
+	Name        string
+	Status      string // e.g. "Running"
+	StatusClass string // e.g. "running" (picks the badge colour)
 }
 
 type AdminDashboardData struct {
-	Stats     []AdminStat
-	TotalJobs string
-	Queues    []QueueShare
-	Jobs      []RecentJob
+	Stats []AdminStat
+	Jobs  []RecentJob
 }
 
 // ---------- Admin jobs list data ----------
@@ -446,31 +443,42 @@ func userResults(w http.ResponseWriter, r *http.Request) {
 
 // ======================= Admin pages =======================
 
-// adminDashboard shows sample data for now; the database will replace it later
-func adminDashboard(w http.ResponseWriter, r *http.Request) {
-	data := AdminDashboardData{
-		Stats: []AdminStat{
-			{Label: "Total Jobs", Value: "1,248", Trend: "▲ 12% this week", TrendClass: "good", Class: ""},
-			{Label: "Completed", Value: "1,162", Trend: "▲ 15% this week", TrendClass: "good", Class: "completed"},
-			{Label: "Processing", Value: "52", Trend: "▼ 8% this week", TrendClass: "bad", Class: "processing"},
-			{Label: "Failed", Value: "34", Trend: "▲ 26% this week", TrendClass: "bad", Class: "failed"},
-		},
-		TotalJobs: "1,248",
-		Queues: []QueueShare{
-			{"image-processing", 32, "c1"},
-			{"data-analysis", 22, "c2"},
-			{"video-encoding", 18, "c3"},
-			{"email-sending", 14, "c4"},
-			{"default", 8, "c5"},
-			{"other", 6, "c6"},
-		},
-		Jobs: []RecentJob{
-			{"job-10427", "Report generation", "Completed"},
-			{"job-10430", "Encode video", "Running"},
-			{"job-10426", "Image processing", "Queued"},
-		},
+// adminDashboard shows real job counts and the latest jobs from the
+// database, across all users. With an empty database every count is 0.
+func adminDashboard(database *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		overview, err := job.AdminOverview(r.Context(), database, 10)
+		if err != nil {
+			log.Printf("admin dashboard: %v", err)
+			http.Error(w, "Could not load the dashboard", http.StatusInternalServerError)
+			return
+		}
+
+		count := func(status string) string { return strconv.Itoa(overview.ByStatus[status]) }
+		data := AdminDashboardData{
+			Stats: []AdminStat{
+				{Label: "Total Jobs", Value: strconv.Itoa(overview.Total)},
+				{Label: "Queued", Value: count("queued"), Class: "queued"},
+				{Label: "Running", Value: count("running"), Class: "processing"},
+				{Label: "Completed", Value: count("completed"), Class: "completed"},
+				{Label: "Failed", Value: count("failed"), Class: "failed"},
+			},
+		}
+		for _, j := range overview.Recent {
+			name := j.Name
+			if name == "" {
+				name = "Unnamed job"
+			}
+			data.Jobs = append(data.Jobs, RecentJob{
+				ID:          j.ID,
+				ShortID:     j.ID[:8],
+				Name:        name,
+				Status:      strings.ToUpper(j.Status[:1]) + j.Status[1:],
+				StatusClass: j.Status,
+			})
+		}
+		render(w, r, "admin", "admin/dashboard.html", PageData{Title: "Dashboard", Data: data})
 	}
-	render(w, r, "admin", "admin/dashboard.html", PageData{Title: "Dashboard", Data: data})
 }
 
 // sample jobs for now; the database will replace this later
@@ -890,7 +898,7 @@ func main() {
 
 	// Admin
 	http.Handle("/admin/{$}", http.RedirectHandler("/admin/dashboard", http.StatusFound))
-	http.HandleFunc("/admin/dashboard", adminDashboard)
+	http.HandleFunc("/admin/dashboard", adminDashboard(database))
 	http.HandleFunc("/admin/jobs", adminJobs)
 	http.HandleFunc("/admin/jobs/details", adminJobDetails)
 	http.HandleFunc("/admin/workers", adminWorkers)
