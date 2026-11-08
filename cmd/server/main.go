@@ -11,8 +11,11 @@ import (
 	"strconv"
 	"strings"
 	"telos/internal/api"
+	"telos/internal/coordinator"
 	"telos/internal/db"
 	"telos/internal/job"
+	"telos/internal/queue"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -885,6 +888,19 @@ func main() {
 	http.HandleFunc("POST /api/jobs", jobsHandler.Submit)
 	http.HandleFunc("GET /api/jobs", jobsHandler.List)
 	http.HandleFunc("GET /api/jobs/{id}", jobsHandler.Get)
+
+	// Worker API (TEL-80): workers register, take tasks and send results.
+	workQueue := queue.New(database)
+	workerHandler := &api.WorkerHandler{DB: database, Queue: workQueue}
+	http.HandleFunc("POST /api/workers/register", workerHandler.RegisterWorker)
+	http.HandleFunc("POST /api/worker/tasks/claim", workerHandler.Claim)
+	http.HandleFunc("POST /api/worker/tasks/{id}/start", workerHandler.Start)
+	http.HandleFunc("POST /api/worker/tasks/{id}/complete", workerHandler.Complete)
+	http.HandleFunc("POST /api/worker/tasks/{id}/fail", workerHandler.Fail)
+
+	// Coordinator (TEL-80): turns queued jobs into tasks and completes jobs
+	// whose tasks are done. Runs in the background for as long as the server.
+	go coordinator.New(database).Run(context.Background(), time.Second)
 
 	// Public pages (standalone, no sidebar)
 	http.HandleFunc("/{$}", loginPage("home.html"))

@@ -2,7 +2,20 @@
 <div class="job-head">
   <h1>Job Results</h1>
 </div>
-<div class="panel">
-  <p class="empty-note">Actual worker results are not available yet. Results will appear here once the worker output format is implemented.</p>
+
+<p id="results-message" class="job-sub" role="status">Loading result...</p>
+
+<div id="results-panel" class="panel" hidden>
+  <div class="job-meta">
+    <span>Job: <strong id="result-job">—</strong></span>
+    <span>Priority: <strong id="result-priority">—</strong></span>
+    <span>Finished: <strong id="result-finished">—</strong></span>
+  </div>
+  <div class="stats result-stats">
+    <div class="stat completed"><span>Words</span><strong id="result-words">—</strong></div>
+    <div class="stat"><span>Lines</span><strong id="result-lines">—</strong></div>
+    <div class="stat"><span>Characters</span><strong id="result-characters">—</strong></div>
+  </div>
 </div>
+<script src="/static/js/results.js?v=1"></script>
 {{end}}
