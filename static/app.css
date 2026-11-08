@@ -1093,3 +1093,7 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
 
 /* ================= User: Job Results (TEL-80) ================= */
 .result-stats { grid-template-columns: repeat(3, 1fr); margin: 16px 0 0; }
+
+/* ================= Admin: Jobs List (real data) ================= */
+.pill.running   { background: #bfe9e6; color: #0f5f5a; }
+.pill.cancelled { background: #ececec; color: #5f5f5f; }

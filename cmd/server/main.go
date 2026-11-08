@@ -143,9 +143,24 @@ type AdminJob struct {
 	Submitted     string
 }
 
+// AdminJobRow is one row of the real admin Jobs List.
+type AdminJobRow struct {
+	ID            string // full UUID (shown when you hover)
+	ShortID       string // first 8 characters, shown on screen
+	Name          string
+	Queue         string
+	Priority      string // e.g. "High"
+	PriorityClass string // high, normal or low (pill colour)
+	Status        string // e.g. "Running"
+	StatusClass   string // queued, running, completed, failed or cancelled
+	Worker        string
+	Duration      string
+	Submitted     string
+}
+
 type AdminJobsData struct {
-	Total    string
-	Jobs     []AdminJob
+	Total    int
+	Jobs     []AdminJobRow
 	Query    string // text typed in the filter box
 	Status   string // selected status ("" means all)
 	Queue    string // selected queue ("" means all)
@@ -495,39 +510,92 @@ var allJobs = []AdminJob{
 	{"#J-10426", "Resize batch", "image-processing", "Medium", "medium", "Queued", "queued", "—", "—", "10 min ago"},
 }
 
-// adminJobs shows the jobs list and applies the filters from the address,
-// for example /admin/jobs?q=video&status=Processing&queue=video-encoding
-func adminJobs(w http.ResponseWriter, r *http.Request) {
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
-	status := r.URL.Query().Get("status")
-	queue := r.URL.Query().Get("queue")
+// adminJobs shows every user's jobs from the database, newest first, with
+// the filters from the address (?q=...&status=...&queue=...).
+func adminJobs(database *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		filter := job.AdminFilter{
+			Search: strings.TrimSpace(r.URL.Query().Get("q")),
+			Status: r.URL.Query().Get("status"),
+			Queue:  r.URL.Query().Get("queue"),
+			Limit:  100,
+		}
+		rows, total, err := job.AdminList(r.Context(), database, filter)
+		if err != nil {
+			log.Printf("admin jobs: %v", err)
+			http.Error(w, "Could not load jobs", http.StatusInternalServerError)
+			return
+		}
 
-	var shown []AdminJob
-	for _, j := range allJobs {
-		if q != "" {
-			text := strings.ToLower(j.ID + " " + j.Name + " " + j.Queue + " " + j.Worker)
-			if !strings.Contains(text, strings.ToLower(q)) {
-				continue
+		data := AdminJobsData{
+			Total:    total,
+			Query:    filter.Search,
+			Status:   filter.Status,
+			Queue:    filter.Queue,
+			Filtered: filter.Search != "" || filter.Status != "" || filter.Queue != "",
+		}
+		now := time.Now()
+		for _, j := range rows {
+			worker := j.Worker
+			if worker == "" {
+				worker = "—"
 			}
+			data.Jobs = append(data.Jobs, AdminJobRow{
+				ID:            j.ID,
+				ShortID:       j.ID[:8],
+				Name:          j.Name,
+				Queue:         j.Queue,
+				Priority:      capitalise(j.Priority),
+				PriorityClass: j.Priority,
+				Status:        capitalise(j.Status),
+				StatusClass:   j.Status,
+				Worker:        worker,
+				Duration:      jobDuration(j.StartedAt, j.CompletedAt, now),
+				Submitted:     timeAgo(j.CreatedAt, now),
+			})
 		}
-		if status != "" && j.Status != status {
-			continue
-		}
-		if queue != "" && j.Queue != queue {
-			continue
-		}
-		shown = append(shown, j)
+		render(w, r, "admin", "admin/jobs.html", PageData{Title: "Jobs List", Data: data})
 	}
+}
 
-	data := AdminJobsData{
-		Total:    "1,248",
-		Jobs:     shown,
-		Query:    q,
-		Status:   status,
-		Queue:    queue,
-		Filtered: q != "" || status != "" || queue != "",
+// capitalise turns "running" into "Running".
+func capitalise(s string) string {
+	if s == "" {
+		return s
 	}
-	render(w, r, "admin", "admin/jobs.html", PageData{Title: "Jobs List", Data: data})
+	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+// jobDuration is how long a job has been running ("1m 05s"), or how long it
+// took once finished. "—" if it has not started yet.
+func jobDuration(started, completed *time.Time, now time.Time) string {
+	if started == nil {
+		return "—"
+	}
+	end := now
+	if completed != nil {
+		end = *completed
+	}
+	d := end.Sub(*started).Round(time.Second)
+	if d < time.Minute {
+		return fmt.Sprintf("%ds", int(d.Seconds()))
+	}
+	return fmt.Sprintf("%dm %02ds", int(d.Minutes()), int(d.Seconds())%60)
+}
+
+// timeAgo turns a time into "just now", "5 min ago", "3 h ago" or a date.
+func timeAgo(t, now time.Time) string {
+	d := now.Sub(t)
+	switch {
+	case d < time.Minute:
+		return "just now"
+	case d < time.Hour:
+		return fmt.Sprintf("%d min ago", int(d.Minutes()))
+	case d < 24*time.Hour:
+		return fmt.Sprintf("%d h ago", int(d.Hours()))
+	default:
+		return t.Format("2 Jan 2006")
+	}
 }
 
 // adminJobDetails shows one job from the sample list: /admin/jobs/details?id=J-10432
@@ -915,7 +983,7 @@ func main() {
 	// Admin
 	http.Handle("/admin/{$}", http.RedirectHandler("/admin/dashboard", http.StatusFound))
 	http.HandleFunc("/admin/dashboard", adminDashboard(database))
-	http.HandleFunc("/admin/jobs", adminJobs)
+	http.HandleFunc("/admin/jobs", adminJobs(database))
 	http.HandleFunc("/admin/jobs/details", adminJobDetails)
 	http.HandleFunc("/admin/workers", adminWorkers)
 	http.HandleFunc("/admin/queues", adminQueues)
