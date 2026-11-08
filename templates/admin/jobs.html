@@ -5,23 +5,20 @@
 
 <div class="panel">
   <form class="filters" method="get" action="/admin/jobs">
-    <input type="text" name="q" value="{{.Data.Query}}" placeholder="Filter jobs...">
+    <input type="text" name="q" value="{{.Data.Query}}" placeholder="Filter by job, ID or worker...">
 
     <select name="status" onchange="this.form.submit()">
       <option value="">All Statuses</option>
-      <option value="Processing" {{if eq .Data.Status "Processing"}}selected{{end}}>Processing</option>
-      <option value="Completed"  {{if eq .Data.Status "Completed"}}selected{{end}}>Completed</option>
-      <option value="Failed"     {{if eq .Data.Status "Failed"}}selected{{end}}>Failed</option>
-      <option value="Queued"     {{if eq .Data.Status "Queued"}}selected{{end}}>Queued</option>
+      <option value="queued"    {{if eq .Data.Status "queued"}}selected{{end}}>Queued</option>
+      <option value="running"   {{if eq .Data.Status "running"}}selected{{end}}>Running</option>
+      <option value="completed" {{if eq .Data.Status "completed"}}selected{{end}}>Completed</option>
+      <option value="failed"    {{if eq .Data.Status "failed"}}selected{{end}}>Failed</option>
+      <option value="cancelled" {{if eq .Data.Status "cancelled"}}selected{{end}}>Cancelled</option>
     </select>
 
     <select name="queue" onchange="this.form.submit()">
       <option value="">All Queues</option>
-      <option value="image-processing" {{if eq .Data.Queue "image-processing"}}selected{{end}}>image-processing</option>
-      <option value="data-analysis"    {{if eq .Data.Queue "data-analysis"}}selected{{end}}>data-analysis</option>
-      <option value="video-encoding"   {{if eq .Data.Queue "video-encoding"}}selected{{end}}>video-encoding</option>
-      <option value="email-sending"    {{if eq .Data.Queue "email-sending"}}selected{{end}}>email-sending</option>
-      <option value="default"          {{if eq .Data.Queue "default"}}selected{{end}}>default</option>
+      <option value="text-processing" {{if eq .Data.Queue "text-processing"}}selected{{end}}>text-processing</option>
     </select>
 
     {{if .Data.Filtered}}<a href="/admin/jobs" class="clear">Clear</a>{{end}}
@@ -37,7 +34,7 @@
     <tbody>
       {{range .Data.Jobs}}
       <tr>
-        <td><a href="/admin/jobs/details?id={{.ID}}">{{.ID}}</a></td>
+        <td title="{{.ID}}">{{.ShortID}}</td>
         <td>{{.Name}}</td>
         <td>{{.Queue}}</td>
         <td><span class="pill {{.PriorityClass}}">{{.Priority}}</span></td>
@@ -47,20 +44,13 @@
         <td>{{.Submitted}}</td>
       </tr>
       {{else}}
-      <tr><td colspan="8" class="empty">No jobs match your filters.</td></tr>
+      <tr><td colspan="8" class="empty">{{if .Data.Filtered}}No jobs match your filters.{{else}}No jobs yet. They will appear here once users submit them.{{end}}</td></tr>
       {{end}}
     </tbody>
   </table>
 
   <div class="pager">
-    {{if .Data.Filtered}}
-      <span>Showing {{len .Data.Jobs}} matching jobs</span>
-    {{else}}
-      <span>Showing 1–{{len .Data.Jobs}} of {{.Data.Total}} jobs</span>
-    {{end}}
-    <span class="pages">
-      <a href="#" class="current">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a><a href="#">5</a><a href="#">›</a>
-    </span>
+    <span>Showing {{len .Data.Jobs}} of {{.Data.Total}} jobs (newest first)</span>
   </div>
 </div>
 {{end}}
