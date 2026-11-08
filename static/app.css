@@ -1090,3 +1090,6 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
 .badge.cancelled { background: #ececec; color: #5f5f5f; }
 .badge.unknown   { background: #ececec; color: #5f5f5f; }
 .job-count { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+/* ================= User: Job Results (TEL-80) ================= */
+.result-stats { grid-template-columns: repeat(3, 1fr); margin: 16px 0 0; }
