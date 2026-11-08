@@ -1,4 +1,37 @@
 {{define "content"}}
-<h1>User My Jobs</h1>
-<p>Content goes here.</p>
+<div class="page-head">
+  <div>
+    <h1>My Jobs</h1>
+    <p>Every job you have submitted, newest first.</p>
+  </div>
+  <a href="/user/submit-job" class="btn">+ Submit Job Request</a>
+</div>
+
+<div class="panel">
+  <div class="filters">
+    <input type="text" id="job-search" placeholder="Search by name or ID...">
+    <select id="status-filter">
+      <option value="">All Statuses</option>
+      <option value="queued">Queued</option>
+      <option value="running">Running</option>
+      <option value="completed">Completed</option>
+      <option value="failed">Failed</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+    <span id="job-count" class="job-count"></span>
+  </div>
+
+  <p id="jobs-message" class="empty-note" role="status">Loading jobs...</p>
+
+  <table id="jobs-table" class="jobs-table" hidden>
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Status</th>
+        <th>Priority</th><th>Submitted</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="jobs-body"></tbody>
+  </table>
+</div>
+<script src="/static/js/my-jobs.js?v=1"></script>
 {{end}}
