@@ -1,28 +1,40 @@
 {{define "content"}}
 <div class="job-head">
   <h1>Job Details</h1>
-  <span id="job-status" class="pill queued">Loading...</span>
 </div>
 
 <p id="job-message" class="job-sub" role="status">Loading job...</p>
-<div class="job-title">
-  <h2 id="job-title">Job Details</h2>
-  <span id="job-status-large" class="pill big queued">Loading...</span>
-</div>
 
-<div class="panel">
-  <div class="job-meta" id="job-meta">
-    <span>Type: <strong id="job-type">—</strong></span>
-    <span>Priority: <strong id="job-priority">—</strong></span>
-    <span>Queue: <strong id="job-queue">—</strong></span>
-    <span>Submitted: <strong id="job-created">—</strong></span>
-    <span>Updated: <strong id="job-updated">—</strong></span>
+<div id="job-content" hidden>
+  <div class="job-title">
+    <h2 id="job-title">Job</h2>
+    <span id="job-status" class="pill big queued">—</span>
   </div>
-  <p id="job-error" class="empty-note" hidden></p>
-</div>
 
-<div class="panel job-tabs-panel">
-  <p class="empty-note">Progress, worker information and logs will appear when the backend provides them.</p>
+  <div class="panel">
+    <div class="job-meta">
+      <span>Type: <strong id="job-type">—</strong></span>
+      <span>Priority: <strong id="job-priority">—</strong></span>
+      <span>Queue: <strong id="job-queue">—</strong></span>
+      <span>Submitted: <strong id="job-created">—</strong></span>
+      <span>Updated: <strong id="job-updated">—</strong></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Progress</h3>
+    <div class="steps">
+      <div class="step" id="step-submitted"><i>1</i><span>Submitted</span></div>
+      <div class="step" id="step-started"><i>2</i><span>Started</span></div>
+      <div class="step" id="step-finished"><i>3</i><span>Finished</span></div>
+    </div>
+    <p id="job-progress-note" class="empty-note"></p>
+    <p id="job-error" class="empty-note" hidden></p>
+    <p id="job-result" class="job-result" hidden>
+      Result: <strong id="job-result-text"></strong>
+      &nbsp;<a id="job-result-link" href="/user/results">View results</a>
+    </p>
+  </div>
 </div>
-<script src="/static/js/job-details.js?v=1"></script>
+<script src="/static/js/job-details.js?v=2"></script>
 {{end}}
