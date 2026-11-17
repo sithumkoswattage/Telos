@@ -1099,3 +1099,122 @@ td a { color: var(--teal); font-weight: 600; text-decoration: none; }
 /* ================= Admin: Jobs List (real data) ================= */
 .pill.running   { background: #bfe9e6; color: #0f5f5a; }
 .pill.cancelled { background: #ececec; color: #5f5f5f; }
+
+/* ==================================
+   TEL-81 - Inline edit (click-to-edit)
+   Used with static/js/inline-edit.js. Every class starts with .ie so
+   nothing here can change the look of other components or pages.
+================================== */
+
+.ie {
+  --ie-border: #cfe5dc;
+  --ie-error: #9b1c1c;
+  --ie-warn: #8a6d00;
+  --ie-warn-bg: #fdefc3;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+
+/* View state: the value, shown as plain text with a pencil on hover */
+.ie-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ie-display[hidden],
+.ie-form[hidden],
+.ie-error[hidden],
+.ie-hint[hidden] { display: none; }
+
+/* The halo is a shadow, not padding, so hovering never moves the text */
+.ie-display:hover {
+  background: rgba(15, 118, 110, 0.07);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.07);
+}
+.ie-display:focus-visible {
+  outline: 2px solid rgba(15, 118, 110, 0.45);
+  outline-offset: 2px;
+}
+
+.ie-value { overflow-wrap: break-word; min-width: 0; }
+.ie-value.ie-empty { color: var(--muted); font-style: italic; }
+
+.ie-pencil {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--teal);
+  opacity: 0;
+}
+.ie-display:hover .ie-pencil,
+.ie-display:focus-visible .ie-pencil { opacity: 1; }
+
+/* Touch screens have no hover, so keep the pencil visible */
+@media (hover: none) {
+  .ie-pencil { opacity: 0.6; }
+}
+
+/* Edit state: input, Save, Cancel, then any message underneath */
+.ie-form {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.ie-input {
+  width: 20em;
+  max-width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--ie-border);
+  border-radius: 10px;
+  background: white;
+  color: var(--text);
+  font: inherit;
+}
+.ie[data-type="number"] .ie-input { width: 9em; }
+.ie-input:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+}
+.ie-input[aria-invalid="true"] {
+  border-color: var(--ie-error);
+  box-shadow: 0 0 0 3px rgba(155, 28, 28, 0.12);
+}
+
+.ie-error,
+.ie-hint { flex-basis: 100%; }
+.ie-error {
+  color: var(--ie-error);
+  font-size: 12px;
+  font-weight: 500;
+}
+.ie-hint {
+  flex-basis: auto;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--ie-warn-bg);
+  color: var(--ie-warn);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ie-display,
+  .ie-pencil { transition: background 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease; }
+}
