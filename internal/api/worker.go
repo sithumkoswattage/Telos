@@ -14,11 +14,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/google/uuid"
 
+	"telos/internal/events"
 	"telos/internal/queue"
 )
 
@@ -95,6 +97,7 @@ func (h *WorkerHandler) RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
+	events.Worker(r.Context(), h.DB, id, events.WorkerRegistered, "Worker "+name+" registered")
 	writeJSON(w, http.StatusOK, map[string]string{"id": id})
 }
 
@@ -113,6 +116,8 @@ func (h *WorkerHandler) Claim(w http.ResponseWriter, r *http.Request) {
 		writeQueueError(w, err)
 		return
 	}
+	events.Task(r.Context(), h.DB, task.ID, req.WorkerID, events.TaskAssigned,
+		fmt.Sprintf("Task assigned (attempt %d)", task.Attempts))
 	writeJSON(w, http.StatusOK, TaskResponse{
 		ID: task.ID, JobID: task.JobID, Index: task.Index, Attempts: task.Attempts, Input: task.Input,
 	})
@@ -128,6 +133,7 @@ func (h *WorkerHandler) Start(w http.ResponseWriter, r *http.Request) {
 		writeQueueError(w, err)
 		return
 	}
+	events.Task(r.Context(), h.DB, r.PathValue("id"), req.WorkerID, events.TaskStarted, "Task started")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -145,6 +151,7 @@ func (h *WorkerHandler) Complete(w http.ResponseWriter, r *http.Request) {
 		writeQueueError(w, err)
 		return
 	}
+	events.Task(r.Context(), h.DB, r.PathValue("id"), req.WorkerID, events.TaskCompleted, "Task completed")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -158,6 +165,13 @@ func (h *WorkerHandler) Fail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeQueueError(w, err)
 		return
+	}
+	if retried {
+		events.Task(r.Context(), h.DB, r.PathValue("id"), req.WorkerID, events.TaskRetry,
+			"Task failed, will retry: "+req.Error)
+	} else {
+		events.Task(r.Context(), h.DB, r.PathValue("id"), req.WorkerID, events.TaskFailed,
+			"Task failed, no attempts left: "+req.Error)
 	}
 	writeJSON(w, http.StatusOK, map[string]bool{"retried": retried})
 }

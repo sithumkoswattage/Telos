@@ -956,6 +956,8 @@ func main() {
 	http.HandleFunc("POST /api/jobs", jobsHandler.Submit)
 	http.HandleFunc("GET /api/jobs", jobsHandler.List)
 	http.HandleFunc("GET /api/jobs/{id}", jobsHandler.Get)
+	http.HandleFunc("GET /api/jobs/{id}/result", jobsHandler.Result) // TEL-41
+	http.HandleFunc("GET /api/jobs/{id}/events", jobsHandler.Events) // TEL-41
 
 	// Worker API (TEL-80): workers register, take tasks and send results.
 	workQueue := queue.New(database)

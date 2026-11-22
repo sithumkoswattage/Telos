@@ -21,6 +21,7 @@ import (
 	"log"
 	"time"
 
+	"telos/internal/events"
 	"telos/internal/model"
 	"telos/internal/queue"
 	"telos/internal/textjob"
@@ -90,6 +91,8 @@ func (c *Coordinator) startQueuedJobs(ctx context.Context) error {
 			return err
 		}
 		log.Printf("Job %s started as %d task(s)", j.ID, len(inputs))
+		events.Job(ctx, c.DB, j.ID, "", events.JobStarted,
+			fmt.Sprintf("Split into %d task(s)", len(inputs)))
 	}
 	return nil
 }
@@ -163,15 +166,24 @@ func (c *Coordinator) finish(ctx context.Context, jobID, status string, result j
 	if len(result) > 0 {
 		res = string(result)
 	}
-	_, err := c.DB.ExecContext(ctx, `
+	ret, err := c.DB.ExecContext(ctx, `
 		UPDATE jobs
 		SET status = $2, result = $3, error = $4, completed_at = now(), updated_at = now()
 		WHERE id = $1 AND status = 'running'`,
 		jobID, status, res, reason)
-	if err == nil {
-		log.Printf("Job %s %s", jobID, status)
+	if err != nil {
+		return err
 	}
-	return err
+	// Only log the event if this call really finished the job (not a repeat).
+	if n, _ := ret.RowsAffected(); n == 1 {
+		log.Printf("Job %s %s", jobID, status)
+		if status == "completed" {
+			events.Job(ctx, c.DB, jobID, "", events.JobCompleted, "Job completed")
+		} else {
+			events.Job(ctx, c.DB, jobID, "", events.JobFailed, "Job failed: "+reason)
+		}
+	}
+	return nil
 }
 
 // combine joins the results of a job's tasks (in task order) into the
