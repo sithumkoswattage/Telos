@@ -39,6 +39,7 @@ type workerRequest struct {
 type TaskResponse struct {
 	ID       string          `json:"id"`
 	JobID    string          `json:"job_id"`
+	Index    int             `json:"index"` // which chunk of the job (TEL-37)
 	Attempts int             `json:"attempts"`
 	Input    json.RawMessage `json:"input"`
 }
@@ -113,7 +114,7 @@ func (h *WorkerHandler) Claim(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, TaskResponse{
-		ID: task.ID, JobID: task.JobID, Attempts: task.Attempts, Input: task.Input,
+		ID: task.ID, JobID: task.JobID, Index: task.Index, Attempts: task.Attempts, Input: task.Input,
 	})
 }
 

@@ -8,12 +8,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"telos/internal/db"
 	"telos/internal/model"
+	"telos/internal/textjob"
 )
 
 type fixture struct {
@@ -154,5 +156,63 @@ func TestPermanentTaskFailureFailsJob(t *testing.T) {
 	status, _, reason := f.job(t, id)
 	if status != "failed" || reason == "" {
 		t.Fatalf("job = %s (%q), want failed with a reason", status, reason)
+	}
+}
+
+func TestLongTextJobIsSplitIntoChunks(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	text := strings.Repeat("the quick brown fox jumps over the lazy dog\n", 50)
+	id := f.submit(t, text)
+
+	must(t, f.c.Tick(ctx))
+
+	tasks, err := f.c.Queue.Tasks(ctx, id)
+	must(t, err)
+	if len(tasks) != textjob.DefaultChunks {
+		t.Fatalf("got %d tasks, want %d", len(tasks), textjob.DefaultChunks)
+	}
+	// Put the chunks back together: they must give the original text.
+	var joined strings.Builder
+	for i, task := range tasks {
+		if task.Index != i || task.Status != model.TaskPending {
+			t.Errorf("task %d: index %d, status %s", i, task.Index, task.Status)
+		}
+		var in textjob.Input
+		must(t, json.Unmarshal(task.Input, &in))
+		joined.WriteString(in.Content)
+	}
+	if joined.String() != text {
+		t.Error("the chunks do not add up to the original text")
+	}
+}
+
+func TestChunkResultsAreCombined(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	text := strings.Repeat("one two three\nfour five\n", 40)
+	id := f.submit(t, text)
+	must(t, f.c.Tick(ctx))
+
+	// One worker does every task, then the coordinator combines them.
+	for {
+		task, err := f.c.Queue.ClaimTask(ctx, f.worker)
+		if err != nil {
+			break // no tasks left
+		}
+		result, err := textjob.Run(task.Input)
+		must(t, err)
+		must(t, f.c.Queue.CompleteTask(ctx, task.ID, f.worker, result))
+	}
+	must(t, f.c.Tick(ctx))
+
+	status, result, _ := f.job(t, id)
+	if status != "completed" {
+		t.Fatalf("job status = %s, want completed", status)
+	}
+	var got textjob.Result
+	must(t, json.Unmarshal(result, &got))
+	if want := textjob.Count(text); got != want {
+		t.Errorf("job result = %+v, want %+v", got, want)
 	}
 }
