@@ -60,3 +60,29 @@ If your local database was created before this change, reset it with `docker com
 - `status` is one of `queued`, `running`, `completed`, `failed`, `cancelled`.
 - `404` if the job does not exist or belongs to another user; `400` if `user_id` is missing or an id is not a valid UUID.
 - As with submitting, `user_id` comes from the query string for now and will come from the login token later.
+
+## Running workers (parallel text jobs)
+
+The coordinator (inside the server) splits each text job into up to 4 chunks, cutting only at a space or line break so no word is cut in half. Short texts (under about 100 bytes per chunk) get fewer chunks. Each chunk becomes a task, the workers process the tasks in parallel, and the coordinator adds the results back up into the job's result.
+
+Start the server, then start one or more workers in other terminals, each with its own name:
+
+```
+go run ./cmd/worker -name worker-1
+go run ./cmd/worker -name worker-2
+go run ./cmd/worker -name worker-3
+```
+
+- `-server` sets the server address (default `http://localhost:8080`).
+- If a worker can't reach the server to send a result, it tries again up to 5 times (waiting 1s, 2s, 4s, ...).
+- `Ctrl+C` stops a worker. It finishes and reports the task it is working on first.
+
+## Checking the result against one machine
+
+`cmd/verify` counts a text file locally, submits the same text as a job, waits for the workers, and compares the two results:
+
+```
+go run ./cmd/verify -file cmd/verify/sample.txt
+```
+
+It prints both results side by side and ends with `PASS`, or exits with an error if they differ. The same check runs in the tests: `go test ./internal/textjob` compares the split-and-combine result with the single-machine count for 2,000 random texts.

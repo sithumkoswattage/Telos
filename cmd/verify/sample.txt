@@ -1,0 +1,29 @@
+Telos sample text for the TEL-39 verification.
+
+A distributed system is a group of computers that work together so that, from
+the outside, they look like a single machine. In Telos, a user submits a job,
+the coordinator cuts it into smaller tasks, and several workers process those
+tasks at the same time. When every task is finished, the coordinator puts the
+pieces back together into one result.
+
+Splitting work is only useful if the final answer is still correct. If the
+text is cut in the middle of a word, that word would be counted twice. If it
+is cut in the middle of a line, that line would be counted twice. Telos avoids
+the first problem by only cutting after a space or a line break, and fixes the
+second problem when it combines the results.
+
+This file mixes a few awkward things on purpose:	a tab character,
+accented letters such as café, naïve and résumé,
+
+an empty line above this one, and a final line that has no line break at the end.
+
+Workers can join or leave at any time. A worker asks for a task, counts the
+words, lines and characters in its chunk, and reports the numbers back. If a
+worker cannot reach the server, it waits and tries again, so finished work is
+not lost. If the server says the task now belongs to someone else, the worker
+moves on to the next task.
+
+The verify command counts this same file on one machine and compares that
+answer with the one Telos produces. If the two answers match, the split, the
+parallel processing and the combining step all worked correctly.
+The end
