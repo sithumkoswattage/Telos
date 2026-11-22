@@ -216,3 +216,32 @@ func TestChunkResultsAreCombined(t *testing.T) {
 		t.Errorf("job result = %+v, want %+v", got, want)
 	}
 }
+
+// TEL-41: the coordinator logs job.started and job.completed, once each,
+// even though Tick runs again and again.
+func TestCoordinatorRecordsEvents(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	id := f.submit(t, "one two three")
+	must(t, f.c.Tick(ctx))
+
+	task, err := f.c.Queue.ClaimTask(ctx, f.worker)
+	must(t, err)
+	must(t, f.c.Queue.CompleteTask(ctx, task.ID, f.worker, json.RawMessage(`{"words":3,"lines":1,"characters":13}`)))
+	must(t, f.c.Tick(ctx))
+	must(t, f.c.Tick(ctx)) // a repeat must not log a second job.completed
+
+	rows, err := f.db.Query(`SELECT type, COUNT(*) FROM events WHERE job_id = $1 GROUP BY type`, id)
+	must(t, err)
+	defer rows.Close()
+	counts := map[string]int{}
+	for rows.Next() {
+		var typ string
+		var n int
+		must(t, rows.Scan(&typ, &n))
+		counts[typ] = n
+	}
+	if counts["job.started"] != 1 || counts["job.completed"] != 1 {
+		t.Errorf("events = %v, want job.started and job.completed once each", counts)
+	}
+}

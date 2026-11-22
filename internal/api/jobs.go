@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"telos/internal/events"
 	"telos/internal/job"
 	"telos/internal/model"
 )
@@ -58,7 +59,8 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "content is required")
 		return
 	}
-	if _, err := model.ParsePriority(req.Priority); err != nil {
+	priority, err := model.ParsePriority(req.Priority)
+	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -93,6 +95,9 @@ func (h *JobsHandler) Submit(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	events.Job(r.Context(), h.DB, resp.ID, "", events.JobSubmitted,
+		"Job submitted with "+priority.String()+" priority")
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

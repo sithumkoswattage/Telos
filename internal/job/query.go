@@ -8,6 +8,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"telos/internal/model"
+	"telos/internal/queue"
 )
 
 // maxListLimit caps how many jobs GET /api/jobs returns in one go.
@@ -41,6 +44,10 @@ type Detail struct {
 	CompletedAt *time.Time      `json:"completed_at,omitempty"`
 	Error       string          `json:"error,omitempty"`
 	Result      json.RawMessage `json:"result,omitempty"`
+	// Progress counts the job's tasks by status (TEL-40). It is worked out
+	// from the tasks table on every request and never stored, so it can't
+	// go out of date. A job that has not been split yet has total 0.
+	Progress model.Progress `json:"progress"`
 }
 
 // List returns the user's jobs, newest first (at most maxListLimit).
@@ -116,6 +123,12 @@ func Get(ctx context.Context, db *sql.DB, id, userID string) (Detail, error) {
 	}
 	if result.Valid {
 		d.Result = json.RawMessage(result.String)
+	}
+
+	// TEL-40: done tasks / total tasks, counted now (see queue.Progress).
+	d.Progress, err = queue.New(db).Progress(ctx, d.ID)
+	if err != nil {
+		return Detail{}, err
 	}
 	return d, nil
 }
